@@ -6,8 +6,8 @@ package gumi
 import (
 	"fmt"
 	"image"
-	"github.com/iamGreedy/gumi/renderline"
-	"github.com/iamGreedy/gumi/gcore"
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
 )
 
 // GUMI is a collection of basic elements

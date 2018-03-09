@@ -2,10 +2,11 @@ package gumi
 
 import (
 	"fmt"
+	"github.com/GUMI-golang/gumi/gcore"
 	"github.com/fogleman/gg"
+	"image"
 	"image/color"
 	"strconv"
-	"github.com/iamGreedy/gumi/gcore"
 )
 
 var (
@@ -24,7 +25,7 @@ type _Ruler struct {
 type Graduation struct{}
 
 func (Graduation) Vertical(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) image.Rectangle {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -32,10 +33,11 @@ func (Graduation) Vertical(pivot float64) Drawer {
 			context.DrawLine(0, f, rulerWidth, f)
 		}
 		context.Stroke()
+		return image.Rect(0, 0, context.Width(), context.Height())
 	}}
 }
 func (Graduation) Horizontal(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) image.Rectangle {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -43,13 +45,14 @@ func (Graduation) Horizontal(pivot float64) Drawer {
 			context.DrawLine(f, 0, f, rulerWidth)
 		}
 		context.Stroke()
+		return image.Rect(0, 0, context.Width(), context.Height())
 	}}
 }
 
 type Grid struct{}
 
 func (Grid) Vertical(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) image.Rectangle {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -57,10 +60,11 @@ func (Grid) Vertical(pivot float64) Drawer {
 			context.DrawLine(f, 0, f, float64(context.Height()))
 		}
 		context.Stroke()
+		return image.Rect(0, 0, context.Width(), context.Height())
 	}}
 }
 func (Grid) Horizontal(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style){
+	return FunctionDrawer{func(context *gg.Context, style *Style) image.Rectangle {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -68,13 +72,14 @@ func (Grid) Horizontal(pivot float64) Drawer {
 			context.DrawLine(0, f, float64(context.Width()), f)
 		}
 		context.Stroke()
+		return image.Rect(0, 0, context.Width(), context.Height())
 	}}
 }
 
 type Hint struct{}
 
 func (Hint) Vertical(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) image.Rectangle {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -84,11 +89,12 @@ func (Hint) Vertical(pivot float64) Drawer {
 			context.DrawString(txt, f-w, float64(style.Default.Font.FontHeight().Round()))
 		}
 		context.Stroke()
+		return image.Rect(0, 0, context.Width(), context.Height())
 	}}
 }
 func (Hint) Horizontal(pivot float64) Drawer {
 
-	return FunctionDrawer{func(context *gg.Context, style *Style) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) image.Rectangle {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -97,13 +103,14 @@ func (Hint) Horizontal(pivot float64) Drawer {
 		}
 
 		context.Stroke()
+		return image.Rect(0, 0, context.Width(), context.Height())
 	}}
 }
 
 type Dashgrid struct{}
 
 func (Dashgrid) Vertical(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) image.Rectangle {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -113,10 +120,11 @@ func (Dashgrid) Vertical(pivot float64) Drawer {
 			context.DrawLine(f, 0, f, float64(context.Height()))
 		}
 		context.Stroke()
+		return image.Rect(0, 0, context.Width(), context.Height())
 	}}
 }
 func (Dashgrid) Horizontal(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) image.Rectangle {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -125,11 +133,12 @@ func (Dashgrid) Horizontal(pivot float64) Drawer {
 			context.DrawLine(0, f, float64(context.Width()), f)
 		}
 		context.Stroke()
+		return image.Rect(0, 0, context.Width(), context.Height())
 	}}
 }
 
 func (_Ruler) Size() Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) image.Rectangle {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -152,10 +161,11 @@ func (_Ruler) Size() Drawer {
 		context.DrawString(strconv.FormatInt(int64(context.Height()), 10), rulerWidth, float64(context.Height()/2)+h/4)
 		//
 		context.Stroke()
+		return image.Rect(0, 0, context.Width(), context.Height())
 	}}
 }
 func (_Ruler) Proportion() Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) image.Rectangle {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -170,10 +180,11 @@ func (_Ruler) Proportion() Drawer {
 		bdw, bdh := context.MeasureString(txt)
 		context.DrawString(txt, float64(w)/2-bdw/2, float64(h)/2+bdh/4)
 		context.Stroke()
+		return image.Rect(0, 0, context.Width(), context.Height())
 	}}
 }
 func (_Ruler) Screen() Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) image.Rectangle {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -183,10 +194,11 @@ func (_Ruler) Screen() Drawer {
 			context.DrawString(v.Name[0], float64(v.Width)-w-5, float64(v.Height)-5)
 		}
 		context.Stroke()
+		return image.Rect(0, 0, context.Width(), context.Height())
 	}}
 }
 func (_Ruler) Dots(pivot float64) Drawer {
-	return FunctionDrawer{func(context *gg.Context, style *Style) {
+	return FunctionDrawer{func(context *gg.Context, style *Style) image.Rectangle {
 		style.useContext(context)
 		defer style.releaseContext(context)
 		context.SetColor(rulerColor)
@@ -196,5 +208,6 @@ func (_Ruler) Dots(pivot float64) Drawer {
 			}
 		}
 		context.Stroke()
+		return image.Rect(0, 0, context.Width(), context.Height())
 	}}
 }

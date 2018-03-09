@@ -3,7 +3,7 @@
 package gumi
 
 import (
-	"github.com/iamGreedy/gumi/renderline"
+	"github.com/GUMI-golang/gumi/renderline"
 )
 
 type VoidNode struct {

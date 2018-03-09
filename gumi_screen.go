@@ -3,12 +3,12 @@ package gumi
 import (
 	"image"
 	"math/rand"
-	"github.com/iamGreedy/gumi/renderline"
+	"github.com/GUMI-golang/gumi/renderline"
 )
 
 type Screen struct {
-	rline *renderline.Manager
-	rstyle *Style
+	RenderingPipeline *renderline.Manager
+	rstyle            *Style
 	//
 	_hook  map[uint64]func(event Event) Event
 	_defer map[uint64]func(rgba *image.RGBA)
@@ -20,22 +20,22 @@ type Screen struct {
 
 func NewScreen(w, h int) *Screen {
 	res := &Screen{
-		rline: renderline.NewManager(w, h),
-		rstyle: DefaultStyle(),
-		_hook:  make(map[uint64]func(event Event) Event),
-		_defer: make(map[uint64]func(rgba *image.RGBA)),
+		RenderingPipeline: renderline.NewManager(w, h),
+		rstyle:            DefaultStyle(),
+		_hook:             make(map[uint64]func(event Event) Event),
+		_defer:            make(map[uint64]func(rgba *image.RGBA)),
 	}
 	return res
 }
 
 func (s *Screen) Width() int {
-	return s.rline.Width()
+	return s.RenderingPipeline.Width()
 }
 func (s *Screen) Height() int {
-	return s.rline.Height()
+	return s.RenderingPipeline.Height()
 }
 func (s *Screen) Size() (width, height int) {
-	return s.rline.Size()
+	return s.RenderingPipeline.Size()
 }
 func (s *Screen) Root(root GUMI) {
 	s.root = newGUMIRoot(s, root)
@@ -58,21 +58,23 @@ func (s *Screen) Init() {
 	s.root.GUMIStyle(s.rstyle)
 
 	// renderline은 렌더 트리를 완성시킨 이후 셋업해야 함 따라서 GUMIRenderSetup 이후 Setup을 함
-	s.root.GUMIRenderSetup(s.rline, s.rline.New(nil))
-	s.rline.Setup()
+	s.root.GUMIRenderSetup(s.RenderingPipeline, s.RenderingPipeline.New(nil))
+	s.RenderingPipeline.Setup()
 }
 func (s *Screen) Update(info Information) {
 	s.root.GUMIInfomation(info)
 }
 func (s *Screen) Draw() {
-	s.rline.Render()
+	s.RenderingPipeline.Render()
 }
+//
 func (s *Screen) Frame() image.Image {
-	return s.rline.Image()
+	return s.RenderingPipeline.Image()
 }
 func (s *Screen) RGBA() *image.RGBA {
-	return s.rline.Image()
+	return s.RenderingPipeline.Image()
 }
+
 //
 func (s *Screen) hookReserve() (id uint64) {
 	defer func() {

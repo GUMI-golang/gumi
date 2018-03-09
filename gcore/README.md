@@ -1,5 +1,4 @@
-# GUMRE
-#### GUMRE - GUMi coRE
+# GCore
 
 GUMRE is common utility, and basic library for gumi
 

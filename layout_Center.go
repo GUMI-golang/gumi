@@ -3,8 +3,8 @@ package gumi
 import (
 	"fmt"
 	"image"
-	"github.com/iamGreedy/gumi/renderline"
-	"github.com/iamGreedy/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
+	"github.com/GUMI-golang/gumi/gcore"
 )
 
 // Layout::Center

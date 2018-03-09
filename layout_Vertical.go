@@ -3,8 +3,8 @@ package gumi
 import (
 	"image"
 	"fmt"
-	"github.com/iamGreedy/gumi/renderline"
-	"github.com/iamGreedy/gumi/gcore"
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
 )
 
 // Layout::Horizontal

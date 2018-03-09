@@ -3,9 +3,9 @@ package gumi
 import (
 	"fmt"
 	"image"
-	"github.com/iamGreedy/gumi/renderline"
-	"github.com/iamGreedy/gumi/media"
-	"github.com/iamGreedy/gumi/gcore"
+	"github.com/GUMI-golang/gumi/media"
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
 )
 
 // Actor::Image

@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"github.com/iamGreedy/gumi/renderline"
-	"github.com/iamGreedy/gumi/gcore"
+
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
 )
 
 // Actor::Text

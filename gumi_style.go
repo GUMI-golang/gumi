@@ -2,11 +2,11 @@ package gumi
 
 import (
 	"github.com/fogleman/gg"
-	"github.com/golang/freetype"
+	"github.com/iamGreedy/freetype"
 	"golang.org/x/image/font/gofont/goregular"
 	"sync"
-	"github.com/golang/freetype/truetype"
-	"github.com/iamGreedy/gumi/gcore"
+	"github.com/iamGreedy/freetype/truetype"
+	"github.com/GUMI-golang/gumi/gcore"
 )
 
 type Style struct {

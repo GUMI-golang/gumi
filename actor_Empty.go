@@ -2,8 +2,8 @@ package gumi
 
 import (
 	"fmt"
-	"github.com/iamGreedy/gumi/renderline"
-	"github.com/iamGreedy/gumi/gcore"
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
 )
 
 // Actor::Empty
