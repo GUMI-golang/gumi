@@ -5,7 +5,6 @@ package gumi
 
 import (
 	"fmt"
-	"image"
 	"github.com/GUMI-golang/gumi/gcore"
 	"github.com/GUMI-golang/gumi/renderline"
 )
@@ -16,8 +15,6 @@ type GUMI interface {
 	GUMITree
 	GUMIRenderer
 	GUMIEventer
-
-	// TODO : GUMIRelay
 
 	fmt.Stringer
 }
@@ -44,16 +41,10 @@ type GUMITree interface {
 	Childrun() []GUMI
 }
 type GUMIRenderer interface {
-	GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node)
+	GUMIRenderSetup(man *renderline.Manager, parent renderline.Node)
 }
 type GUMIEventer interface {
 	GUMIHappen(event Event)
 }
 
-// TODO : Relay
-type GUMIRelay interface {
-	GUMIRelayInit()
-	GUMIRelayInfomation(info Information)
-	GUMIRelayStyle(style *Style)
-	GUMIRelayClip(r image.Rectangle)
-}
+

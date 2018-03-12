@@ -41,7 +41,7 @@ func (AEmpty) GUMISize() gcore.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define::Empty
-func (s AEmpty) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+func (s AEmpty) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 }
 
 // GUMIRenderer / GUMIRender				-> Define::Empty

@@ -79,5 +79,5 @@ type styleStore struct {
 }
 type rendererStore struct {
 	rmana *renderline.Manager
-	rnode *renderline.Node
+	rnode renderline.Node
 }

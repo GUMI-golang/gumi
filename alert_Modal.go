@@ -1,10 +1,9 @@
-package temp
+package gumi
 
 import (
-	"image"
+	"github.com/GUMI-golang/gumi/renderline"
+	"github.com/GUMI-golang/gumi/gcore"
 	"fmt"
-	"github.com/iamGreedy/gumi/gumre"
-	"github.com/iamGreedy/gumi/drawer"
 )
 
 // ALert::Modal
@@ -13,10 +12,12 @@ import (
 type ALModal struct {
 	SingleNode
 	//
+	rmana *renderline.Manager
+	rnode *renderline.SelectNode
+	//
 	lastCursorEvent EventCursor
 	//
 	modal GUMI
-	show bool
 }
 
 // GUMIFunction / GUMIInit 					-> Define
@@ -37,16 +38,6 @@ func (s *ALModal) GUMIStyle(style *Style) {
 	s.modal.GUMIStyle(style)
 }
 
-// GUMIFunction / GUMIClip 					-> Define
-func (s *ALModal) GUMIClip(r image.Rectangle) {
-	s.child.GUMIClip(r)
-	s.modal.GUMIClip(r)
-}
-
-// GUMIFunction / GUMIRender 				-> Define::Empty
-func (s *ALModal) GUMIRender(frame *image.RGBA) {
-}
-
 // GUMIFunction / GUMISize 					-> Define
 func (s *ALModal) GUMISize() gcore.Size {
 	return s.child.GUMISize()
@@ -61,24 +52,19 @@ func (s *ALModal) GUMISize() gcore.Size {
 // GUMITree / childrun()					-> SingleNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s *ALModal) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
-	s.child.GUMIRenderSetup(tree, parentnode)
-	s.modal.GUMIRenderSetup(tree, parentnode)
-}
-
-// GUMIRenderer / GUMIUpdate			-> Define
-func (s *ALModal) GUMIUpdate() {
-	if s.show{
-		s.child.GUMIUpdate()
-		s.modal.GUMIUpdate()
-	}else {
-		s.child.GUMIUpdate()
-	}
+func (s *ALModal) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
+	s.rmana = man
+	s.rnode = man.New(parent, renderline.NewSelectNode(2)).(*renderline.SelectNode)
+	s.rnode.Select(renderline.NewSelects(0))
+	s.child.GUMIRenderSetup(man, s.rnode)
+	s.rnode.Select(renderline.NewSelects(1))
+	s.modal.GUMIRenderSetup(man, s.rnode)
+	s.rnode.Select(renderline.NewSelects(0))
 }
 
 // GUMIEventer / GUMIHappen					-> Define
 func (s *ALModal) GUMIHappen(event Event) {
-	if s.show{
+	if s.rnode.GetSelected().Check(1){
 		s.modal.GUMIHappen(event)
 	}else {
 		if event.Kind() == EVENT_CURSOR {
@@ -101,11 +87,11 @@ func ALModal0() *ALModal {
 
 // Constructor 1
 func ALModal1(modal GUMI) *ALModal {
-	temp := &ALModal{
+	temp := ALModal{
 		modal:modal,
 	}
-	temp.modal.born(temp)
-	return temp
+	modal.born(&temp)
+	return &temp
 }
 
 // Method / SetShow
@@ -121,7 +107,7 @@ func (s *ALModal ) Get() bool {
 // Method / SetModal
 func (s *ALModal ) SetModal(modal GUMI)  {
 	s.modal = modal
-	s.modal.born(s)
+	modal.born(s)
 }
 
 // Method / GetModal
@@ -131,11 +117,16 @@ func (s *ALModal ) GetModal() GUMI {
 
 // Method / SetShow
 func (s *ALModal ) SetShow(show bool)  {
-	s.show = show
 	s.modal.GUMIHappen(s.lastCursorEvent)
+	if show{
+		s.rnode.Select(renderline.NewSelects(0, 1))
+	}else {
+		s.rnode.Select(renderline.NewSelects(0))
+	}
+	s.rnode.ThrowCache()
 }
 
 // Method / GetShow
 func (s *ALModal ) GetShow() bool {
-	return s.show
+	return s.rnode.GetSelected().Check(1)
 }

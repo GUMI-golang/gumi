@@ -58,9 +58,10 @@ func (s *LVertical) GUMISize() gcore.Size {
 // GUMITree / childrun()					-> MultipleNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define::Empty
-func (s *LVertical) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+func (s *LVertical) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 	s.rmana = man
-	s.rnode = man.New(parent)
+	s.rnode = man.New(parent, nil)
+	var rnodealloc = s.rnode.GetAllocation()
 	// 렌더링 영역 할당
 	var tempVert = make([]gcore.Length, len(s.child))
 	var tempHori = make([]gcore.Length, len(s.child))
@@ -68,18 +69,18 @@ func (s *LVertical) GUMIRenderSetup(man *renderline.Manager, parent *renderline.
 		tempVert[i] = v.GUMISize().Vertical
 		tempHori[i] = v.GUMISize().Horizontal
 	}
-	dis := s.rule(s.rnode.Allocation.Dy(), tempVert)
+	dis := s.rule(rnodealloc.Dy(), tempVert)
 	//
-	var startat = s.rnode.Allocation.Min.Y
+	var startat = rnodealloc.Min.Y
 	for i, v := range s.child{
 		inrect := image.Rect(
-			s.rnode.Allocation.Min.X,
+			rnodealloc.Min.X,
 			startat,
-			s.rnode.Allocation.Max.X,
+			rnodealloc.Max.X,
 			startat + dis[i],
 		)
-		temp := s.rmana.New(s.rnode)
-		temp.Allocation = inrect
+		temp := s.rmana.New(s.rnode, nil)
+		temp.SetAllocation(inrect)
 		v.GUMIRenderSetup(s.rmana, temp)
 		startat += dis[i]
 	}

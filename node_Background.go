@@ -39,10 +39,10 @@ func (s NBackground) GUMISize() gcore.Size {
 	return s.child.GUMISize()
 }
 
-func (s *NBackground) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+func (s *NBackground) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 	s.rmana = man
-	s.rnode = man.New(parent)
-	s.rnode.Do = s
+	s.rnode = man.New(parent, nil)
+	s.rnode.SetJob(s)
 	s.child.GUMIRenderSetup(s.rmana, s.rnode)
 }
 func (s *NBackground) GUMIHappen(event Event) {

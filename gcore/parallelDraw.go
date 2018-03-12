@@ -1,4 +1,4 @@
-package renderline
+package gcore
 
 import (
 	"image"

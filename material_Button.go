@@ -136,10 +136,10 @@ func (s *MTButton) GUMISize() gcore.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define
-func (s *MTButton) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+func (s *MTButton) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 	s.rmana = man
-	s.rnode = man.New(parent)
-	s.rnode.Do = s
+	s.rnode = man.New(parent, nil)
+	s.rnode.SetJob(s)
 }
 
 
@@ -166,7 +166,7 @@ func (s *MTButton) GUMIHappen(event Event) {
 	case EventCursor:
 		x := int(ev.X)
 		y := int(ev.Y)
-		bd := s.rnode.Allocation
+		bd := s.rnode.GetAllocation()
 		if (bd.Min.X <= x && x < bd.Max.X) && (bd.Min.Y <= y && y < bd.Max.Y) {
 			if s.onFocus != nil {
 				s.onFocus(s, true)

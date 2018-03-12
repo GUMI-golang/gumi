@@ -47,19 +47,20 @@ func (s *NMargin) GUMISize() gcore.Size {
 	}
 }
 
-func (s *NMargin) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+func (s *NMargin) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 	s.rmana = man
-	s.rnode = man.New(parent)
+	s.rnode = man.New(parent, nil)
 
 	var sz = s.child.GUMISize()
-	var w, l, _ = calcMargin(parent.Allocation.Dx(), sz.Horizontal, s.b.L, s.b.R)
-	var h, _, t = calcMargin(parent.Allocation.Dy(), sz.Vertical, s.b.B, s.b.T)
-	s.rnode.Allocation = image.Rect(
-		parent.Allocation.Min.X + l,
-		parent.Allocation.Min.Y + t,
-		parent.Allocation.Min.X + l + w,
-		parent.Allocation.Min.Y + t + h,
-	)
+	var palloc = parent.GetAllocation()
+	var w, l, _ = calcMargin(palloc.Dx(), sz.Horizontal, s.b.L, s.b.R)
+	var h, _, t = calcMargin(palloc.Dy(), sz.Vertical, s.b.B, s.b.T)
+	s.rnode.SetAllocation(image.Rect(
+		palloc.Min.X + l,
+		palloc.Min.Y + t,
+		palloc.Min.X + l + w,
+		palloc.Min.Y + t + h,
+	))
 	s.child.GUMIRenderSetup(s.rmana, s.rnode)
 }
 

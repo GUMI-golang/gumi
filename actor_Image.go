@@ -55,10 +55,10 @@ func (s AImage) GUMISize() gcore.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s *AImage) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+func (s *AImage) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 	s.rmana = man
-	s.rnode = man.New(parent)
-	s.rnode.Do = s
+	s.rnode = man.New(parent, nil)
+	s.rnode.SetJob(s)
 }
 
 // GUMIEventer / GUMIHappen					-> Define

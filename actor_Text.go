@@ -89,10 +89,10 @@ func (s *AText) GUMISize() gcore.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s *AText) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+func (s *AText) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 	s.rmana = man
-	s.rnode = man.New(parent)
-	s.rnode.Do = s
+	s.rnode = man.New(parent, nil)
+	s.rnode.SetJob(s)
 }
 
 

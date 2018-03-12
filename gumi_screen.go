@@ -58,7 +58,7 @@ func (s *Screen) Init() {
 	s.root.GUMIStyle(s.rstyle)
 
 	// renderline은 렌더 트리를 완성시킨 이후 셋업해야 함 따라서 GUMIRenderSetup 이후 Setup을 함
-	s.root.GUMIRenderSetup(s.RenderingPipeline, s.RenderingPipeline.New(nil))
+	s.root.GUMIRenderSetup(s.RenderingPipeline, s.RenderingPipeline.New(nil, nil))
 	s.RenderingPipeline.Setup()
 }
 func (s *Screen) Update(info Information) {

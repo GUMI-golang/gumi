@@ -74,10 +74,10 @@ func (s *LCenter) GUMISize() gcore.Size {
 // GUMITree / childrun()					-> SingleNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define::Empty
-func (s *LCenter) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+func (s *LCenter) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 	s.rmana = man
-	s.rnode = man.New(parent)
-	s.rnode.Allocation = s.clipsize(s.rnode.Allocation)
+	s.rnode = man.New(parent, nil)
+	s.rnode.SetAllocation(s.clipsize(s.rnode.GetAllocation()))
 	s.child.GUMIRenderSetup(s.rmana, s.rnode)
 }
 

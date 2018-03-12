@@ -42,7 +42,7 @@ func (s *NSize) GUMISize() gcore.Size {
 	return temp
 }
 
-func (s *NSize) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+func (s *NSize) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 	s.child.GUMIRenderSetup(man,parent)
 }
 

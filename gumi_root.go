@@ -42,7 +42,7 @@ func (s *gumiRoot) GUMISize() gcore.Size {
 
 
 // GUMIRenderer / GUMIRenderSetup			-> Define::Empty
-func (s *gumiRoot) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+func (s *gumiRoot) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 	s.child.GUMIRenderSetup(man, parent)
 }
 

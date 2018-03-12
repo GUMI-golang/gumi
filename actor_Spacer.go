@@ -45,7 +45,7 @@ func (s *ASpacer) GUMISize() gcore.Size {
 // GUMITree / childrun						-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s ASpacer) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+func (s ASpacer) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 }
 
 // GUMIEventer / GUMIHappen					-> Define

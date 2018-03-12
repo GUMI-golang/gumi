@@ -19,12 +19,12 @@ func (s *NDrawing) BaseRender(subimg *image.RGBA) {
 }
 
 func (s *NDrawing) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
-	sub := fullimg.SubImage(s.rnode.Allocation).(*image.RGBA)
+	sub := fullimg.SubImage(s.rnode.GetAllocation()).(*image.RGBA)
 	ctx := createContext(sub)
 	var res image.Rectangle
 	for _, v := range s.drawfuncs {
 		ctx.Push()
-		res = res.Union(v.Draw(ctx, s.style).Add(s.rnode.Allocation.Min))
+		res = res.Union(v.Draw(ctx, s.style).Add(s.rnode.GetAllocation().Min))
 		ctx.Pop()
 	}
 	return res
@@ -44,10 +44,10 @@ func (s *NDrawing) GUMIStyle(style *Style) {
 	s.child.GUMIStyle(style)
 }
 
-func (s *NDrawing) GUMIRenderSetup(man *renderline.Manager, parent *renderline.Node) {
+func (s *NDrawing) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 	s.rmana = man
-	s.rnode = man.New(parent)
-	s.rnode.Do = s
+	s.rnode = man.New(parent, nil)
+	s.rnode.SetJob(s)
 	s.child.GUMIRenderSetup(man, s.rnode)
 }
 
