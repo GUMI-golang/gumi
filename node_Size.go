@@ -43,7 +43,7 @@ func (s *NSize) GUMISize() gcore.Size {
 }
 
 func (s *NSize) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
-	s.child.GUMIRenderSetup(man,parent)
+	s.child.GUMIRenderSetup(man, parent)
 }
 
 func (s *NSize) GUMIHappen(event Event) {

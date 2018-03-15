@@ -46,5 +46,3 @@ type GUMIRenderer interface {
 type GUMIEventer interface {
 	GUMIHappen(event Event)
 }
-
-

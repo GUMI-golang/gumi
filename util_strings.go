@@ -8,26 +8,29 @@ func StringBackSpace(str string, count int) string {
 	}
 	return string(temp[:templen-count])
 }
-func StringControlBackSpace(str string) (res string) {
+func StringControlBackSpace(str string, count int) (res string) {
 	temp := []rune(str)
 	to := len(temp) - 1
-	if to < 0{
+	if to < 0 {
 		return ""
 	}
-	if temp[to] == ' '{
-		for i := to; i >= 0; i --{
+	//
+	for i := 0 ; i < count || to != 0; i ++{
+		if temp[to] == ' ' {
+			for i := to; i >= 0; i-- {
+				to = i
+				if temp[i] != ' ' {
+					break
+				}
+			}
+		}
+		for i := to; i >= 0; i-- {
 			to = i
-			if temp[i] != ' '{
+			if temp[i] == ' ' {
+				to += 1
 				break
 			}
 		}
 	}
-	for i := to; i >= 0; i --{
-		to = i
-		if temp[i] == ' '{
-			to += 1
-			break
-		}
-	}
-	return   string(temp[:to])
+	return string(temp[:to])
 }

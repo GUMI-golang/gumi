@@ -13,6 +13,8 @@ const (
 	STRIDECOUNT = 4
 )
 
+const m = 1<<16 - 1
+
 func startEdit(src image.Image) (rgba *image.RGBA) {
 	if v, ok := src.(*image.RGBA); ok {
 		return v
@@ -35,15 +37,16 @@ func sizeEidt(rgba *image.RGBA) (w, h int) {
 	sz := rgba.Rect.Size()
 	return sz.X, sz.Y
 }
+
 //
-func paddingEmpty(src *image.RGBA, padW, padH int) (dst * image.RGBA) {
+func paddingEmpty(src *image.RGBA, padW, padH int) (dst *image.RGBA) {
 	var srcw, srch = sizeEidt(src)
 	var dstW, dstH = srcw + padW*2, srch + padH*2
-	dst = image.NewRGBA(image.Rect(0,0,dstW, dstH))
-	draw.Draw(dst, image.Rect(padW, padH, padW + srcw, padH + srch), src, image.ZP, draw.Src)
+	dst = image.NewRGBA(image.Rect(0, 0, dstW, dstH))
+	draw.Draw(dst, image.Rect(padW, padH, padW+srcw, padH+srch), src, image.ZP, draw.Src)
 	return dst
 }
-func paddingExtend(src * image.RGBA, padW, padH int) (dst * image.RGBA) {
+func paddingExtend(src *image.RGBA, padW, padH int) (dst *image.RGBA) {
 	dst = paddingEmpty(src, padW, padH)
 	dstW, dstH := sizeEidt(dst)
 	for y := 0; y < dstH; y++ {
@@ -66,7 +69,7 @@ func paddingExtend(src * image.RGBA, padW, padH int) (dst * image.RGBA) {
 				x = dstW - padW - 1
 				continue
 			}
-			dstOffset := dst.PixOffset(x, y,)
+			dstOffset := dst.PixOffset(x, y)
 			edgeOffset := dst.PixOffset(ix, iy)
 			dst.Pix[dstOffset+R] = dst.Pix[edgeOffset+R]
 			dst.Pix[dstOffset+G] = dst.Pix[edgeOffset+G]

@@ -1,10 +1,10 @@
-package temp
+package gumi
 
 import (
 	"fmt"
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
 	"github.com/fogleman/gg"
-	"github.com/iamGreedy/gumi/drawer"
-	"github.com/iamGreedy/gumi/gumre"
 	"image"
 	"math"
 )
@@ -31,44 +31,174 @@ const (
 // Material::Dropbox
 //
 // Material theme Dropbox(Combo Box)
-type MTDropbox struct {
-	VoidNode
-	boundStore
-	styleStore
-	rendererStore
-	//
-	scr     *Screen
-	deferid uint64
-	hookid  uint64
-	//
-	mtColorSingle
-	studio  *gcore.Studio
-	stretch *gcore.Reaching
-	scroll  *gcore.Reaching
-	//
-	Elems    mtDropboxElemList
-	selected int
-	hover    int
-	inactive bool
-	//
-	boxHeight  int
-	boxCut     int
-	boxMaximum int
-	//
-	onChange MTDropboxChange
-	//
-	cursorEnter, active bool
+type (
+	MTDropbox struct {
+		VoidNode
+		styleStore
+		rendererStore
+		//
+		scr    *Screen
+		hookid uint64
+		//
+		mtColorSingle
+		studio  *gcore.Studio
+		stretch *gcore.Reaching
+		scroll  *gcore.Reaching
+		//
+		Elems    mtDropboxElemList
+		selected int
+		hover    int
+		inactive bool
+		//
+		boxHeight  int
+		boxCut     int
+		boxMaximum int
+		//
+		onChange MTDropboxChange
+		//
+		cursorEnter, active bool
+	}
+	// When changed selected, it occur
+	MTDropboxChange func(self *MTDropbox, selected string)
+)
+
+func (s *MTDropbox) BaseRender(subimg *image.RGBA) {
+	var baseColor, mainColor = s.GetMaterialColor().Color()
+	var bd = s.rnode.GetAllocation()
+	s.boxCut = 0
+	s.boxHeight = mtDropboxElemMargin*(s.Elems.Length()+1) + s.Elems.heightSum()
+	if s.boxMaximum < s.boxHeight {
+		s.boxCut += s.boxHeight - s.boxMaximum
+		s.boxHeight = s.boxMaximum
+	}
+	if bd.Max.Y+s.boxHeight > s.rmana.Height() {
+		s.boxCut += (s.rnode.GetAllocation().Max.Y + s.boxHeight) - s.rmana.Height()
+	}
+	var val = s.stretch.Value()
+	//var per = s.stretch.Percent()
+	if !(val > 0 && s.Elems.Length() > 0) {
+		var ctx = createContext(subimg)
+		s.style.useContext(ctx)
+		defer s.style.releaseContext(ctx)
+		//
+		var w, h = float64(ctx.Width()), float64(ctx.Height())
+		var radius = float64(bd.Dy()) / 2
+		//
+		ctx.SetColor(baseColor)
+		ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
+		ctx.DrawRectangle(radius, 0, w-radius*2, h)
+		ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(90))
+		ctx.Fill()
+		//
+		ctx.SetColor(mainColor)
+		elem := s.Elems.getForDraw(s.selected)
+		if len(elem.content) > 0 {
+			ctx.DrawString(elem.content, radius, (h-float64(elem.h))/2+float64(elem.h))
+			ctx.Stroke()
+		}
+		ctx.DrawCircle(w-radius, radius, mtDropboxScroolWidth/2)
+		ctx.Fill()
+	}
 }
 
-// Material::Dropbox<Callback> -> Change
-//
-// When changed selected, it occur
-type MTDropboxChange func(self *MTDropbox, selected string)
+func (s *MTDropbox) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
+	var alloc = s.rnode.GetAllocation()
+	var radius = float64(alloc.Dy()) / 2
+	var val = s.stretch.Value()
+	var per = s.stretch.Percent()
+	var scr = s.scroll.Value()
+	var baseColor, mainColor = s.GetMaterialColor().Color()
+	//
+	if val > 0 && s.Elems.Length() > 0 {
+		// select, background, scrool
+		func() {
+			bd := alloc
+			bd.Max.Y += int(val)
+			var ctx = createContext(fullimg.SubImage(bd).(*image.RGBA))
+			s.style.useContext(ctx)
+			defer s.style.releaseContext(ctx)
+
+			//
+			var w, h = float64(ctx.Width()), float64(ctx.Height())
+			// background
+			ctx.SetColor(baseColor)
+			ctx.DrawArc(radius, radius, radius, gg.Radians(180), gg.Radians(270))
+			ctx.DrawArc(radius, h-radius, radius, gg.Radians(90), gg.Radians(180))
+			ctx.DrawRectangle(radius-1, 0, w-radius*2+1, h)
+			ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(0))
+			ctx.DrawArc(w-radius, h-radius, radius, gg.Radians(0), gg.Radians(90))
+			ctx.Fill()
+			// outline
+			ctx.SetColor(Scale.Color(baseColor, mainColor, per))
+			ctx.DrawArc(radius, radius, radius, gg.Radians(180), gg.Radians(270))
+			ctx.DrawLine(radius, 0, w-radius, 0)
+			ctx.DrawArc(w-radius, radius, radius, gg.Radians(270), gg.Radians(360))
+			ctx.DrawLine(w, radius, w, h-radius)
+			ctx.DrawArc(w-radius, h-radius, radius, gg.Radians(0), gg.Radians(90))
+			ctx.DrawLine(w-radius, h, radius, h)
+			ctx.DrawArc(radius, h-radius, radius, gg.Radians(90), gg.Radians(180))
+			ctx.DrawLine(0, h-radius, 0, radius)
+			ctx.Stroke()
+			// selected underline
+			ctx.SetColor(mainColor)
+			ctx.Push()
+			ctx.SetLineWidth(.25)
+			ctx.DrawLine(radius, float64(bd.Dy()), w-2*radius, float64(bd.Dy()))
+			ctx.Stroke()
+			//
+
+			ctx.Pop()
+			// selected
+			selectedElem := s.Elems.getForDraw(s.selected)
+			if len(selectedElem.content) > 0 {
+				ctx.DrawString(selectedElem.content, radius, (float64(bd.Dy())-float64(selectedElem.h))/2+float64(selectedElem.h))
+				ctx.Stroke()
+			}
+			// scroll
+
+			percent := float64(s.boxHeight-s.boxCut) / float64(s.boxHeight)
+			scroolPercent := scr / float64(s.boxHeight)
+			if percent < 0 {
+				percent = 0
+			}
+			if percent > 1 {
+				percent = 1
+			}
+
+			ctx.DrawArc(w-radius, radius+(scroolPercent)*(h-radius*2), mtDropboxScroolWidth/2, gg.Radians(180), gg.Radians(360))
+			ctx.DrawRectangle(w-radius-mtDropboxScroolWidth/2, radius+(scroolPercent)*(h-radius*2), mtDropboxScroolWidth, percent*(h-radius*2))
+			ctx.DrawArc(w-radius, radius+(scroolPercent)*(h-radius*2)+percent*(h-radius*2), mtDropboxScroolWidth/2, gg.Radians(0), gg.Radians(180))
+			ctx.Fill()
+		}()
+		// elems, hover
+		func() {
+			bd := alloc
+			bd.Min.Y = alloc.Max.Y
+			bd.Max.Y = alloc.Max.Y + int(val)
+			var ctx = createContext(fullimg.SubImage(bd).(*image.RGBA))
+			s.style.useContext(ctx)
+			defer s.style.releaseContext(ctx)
+			//
+			sum := mtDropboxElemMargin
+			ctx.SetColor(mainColor)
+			for i, v := range s.Elems.refer() {
+				drawY := float64(sum+v.h) - float64(s.scroll.Value())
+				ctx.DrawString(v.content, radius, drawY)
+				ctx.Stroke()
+				if i == s.hover {
+					ctx.DrawLine(radius, drawY+mtDropboxElemUnderline, radius+float64(v.w), drawY+mtDropboxElemUnderline)
+					ctx.Stroke()
+				}
+				sum += v.h + mtDropboxElemMargin
+			}
+		}()
+	}
+	return image.ZR
+}
 
 // GUMIFunction / GUMIInit 					-> Define
 func (s *MTDropbox) GUMIInit() {
 	s.scr = Root(s).Screen()
-	s.deferid = s.scr.deferReserve()
 	s.hookid = s.scr.hookReserve()
 	//
 	s.studio = gcore.Animation.Studio(mtDropboxAnimationLength)
@@ -96,137 +226,6 @@ func (s *MTDropbox) GUMIStyle(style *Style) {
 	}
 }
 
-// GUMIFunction / GUMIClip 					-> Define
-func (s *MTDropbox) GUMIClip(r image.Rectangle) {
-	s.bound = r
-}
-
-// GUMIFunction / GUMIRender 				-> Define
-func (s *MTDropbox) GUMIRender(frame *image.RGBA) {
-	var baseColor, mainColor = s.GetMaterialColor().Color()
-	s.boxCut = 0
-	s.boxHeight = mtDropboxElemMargin*(s.Elems.Length()+1) + s.Elems.heightSum()
-	if s.boxMaximum < s.boxHeight {
-		s.boxCut += s.boxHeight - s.boxMaximum
-		s.boxHeight = s.boxMaximum
-	}
-	if s.bound.Max.Y+s.boxHeight > frame.Rect.Max.Y {
-		s.boxCut += (s.bound.Max.Y + s.boxHeight) - frame.Rect.Max.Y
-	}
-	var val = s.stretch.Value()
-	var per = s.stretch.Percent()
-	var scr = s.scroll.Value()
-	if val > 0 && s.Elems.Length() > 0 {
-		// TODO : DEFERCALL
-		s.scr.deferRequest(s.deferid, func(rgba *image.RGBA) {
-			var radius = float64(s.bound.Dy()) / 2
-			// selecte, background, scrool
-			func() {
-				bd := s.bound
-				bd.Max.Y += int(val)
-				var ctx = createContextRGBASub(rgba, bd)
-				s.style.useContext(ctx)
-				defer s.style.releaseContext(ctx)
-				//
-				var w, h = float64(ctx.Width()), float64(ctx.Height())
-				// background
-				ctx.SetColor(baseColor)
-				ctx.DrawArc(radius, radius, radius, gg.Radians(180), gg.Radians(270))
-				ctx.DrawArc(radius, h-radius, radius, gg.Radians(90), gg.Radians(180))
-				ctx.DrawRectangle(radius-1, 0, w-radius*2+1, h)
-				ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(0))
-				ctx.DrawArc(w-radius, h-radius, radius, gg.Radians(0), gg.Radians(90))
-				ctx.Fill()
-				// outline
-				ctx.SetColor(Scale.Color(baseColor, mainColor, per))
-				ctx.DrawArc(radius, radius, radius, gg.Radians(180), gg.Radians(270))
-				ctx.DrawLine(radius, 0, w-radius, 0)
-				ctx.DrawArc(w-radius, radius, radius, gg.Radians(270), gg.Radians(360))
-				ctx.DrawLine(w, radius, w, h-radius)
-				ctx.DrawArc(w-radius, h-radius, radius, gg.Radians(0), gg.Radians(90))
-				ctx.DrawLine(w-radius, h, radius, h)
-				ctx.DrawArc(radius, h-radius, radius, gg.Radians(90), gg.Radians(180))
-				ctx.DrawLine(0, h-radius, 0, radius)
-				ctx.Stroke()
-				// selected underline
-				ctx.SetColor(mainColor)
-				ctx.Push()
-				ctx.SetLineWidth(.25)
-				ctx.DrawLine(radius, float64(s.bound.Dy()), w-2*radius, float64(s.bound.Dy()))
-				ctx.Stroke()
-				//
-
-				ctx.Pop()
-				// selected
-				selectedElem := s.Elems.getForDraw(s.selected)
-				if len(selectedElem.content) > 0 {
-					ctx.DrawString(selectedElem.content, radius, (float64(s.bound.Dy())-float64(selectedElem.h))/2+float64(selectedElem.h))
-					ctx.Stroke()
-				}
-				// scroll
-
-				percent := float64(s.boxHeight-s.boxCut) / float64(s.boxHeight)
-				scroolPercent := scr / float64(s.boxHeight)
-				if percent < 0 {
-					percent = 0
-				}
-				if percent > 1 {
-					percent = 1
-				}
-
-				ctx.DrawArc(w-radius, radius+(scroolPercent)*(h-radius*2), mtDropboxScroolWidth/2, gg.Radians(180), gg.Radians(360))
-				ctx.DrawRectangle(w-radius-mtDropboxScroolWidth/2, radius+(scroolPercent)*(h-radius*2), mtDropboxScroolWidth, percent*(h-radius*2))
-				ctx.DrawArc(w-radius, radius+(scroolPercent)*(h-radius*2)+percent*(h-radius*2), mtDropboxScroolWidth/2, gg.Radians(0), gg.Radians(180))
-				ctx.Fill()
-			}()
-			// elems, hover
-			func() {
-				bd := s.bound
-				bd.Min.Y = s.bound.Max.Y
-				bd.Max.Y = s.bound.Max.Y + int(val)
-				var ctx = createContextRGBASub(rgba, bd)
-				s.style.useContext(ctx)
-				defer s.style.releaseContext(ctx)
-				sum := mtDropboxElemMargin
-				ctx.SetColor(mainColor)
-				for i, v := range s.Elems.refer() {
-					drawY := float64(sum+v.h) - float64(s.scroll.Value())
-					ctx.DrawString(v.content, radius, drawY)
-					ctx.Stroke()
-					if i == s.hover {
-						ctx.DrawLine(radius, drawY+mtDropboxElemUnderline, radius+float64(v.w), drawY+mtDropboxElemUnderline)
-						ctx.Stroke()
-					}
-					sum += v.h + mtDropboxElemMargin
-				}
-			}()
-		})
-	} else {
-		s.scr.deferRequest(s.deferid, nil)
-		var ctx = createContextRGBASub(frame, s.bound)
-		s.style.useContext(ctx)
-		defer s.style.releaseContext(ctx)
-		//
-		var w, h = float64(ctx.Width()), float64(ctx.Height())
-		var radius = float64(s.bound.Dy()) / 2
-		//
-		ctx.SetColor(baseColor)
-		ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
-		ctx.DrawRectangle(radius, 0, w-radius*2, h)
-		ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(90))
-		ctx.Fill()
-		//
-		ctx.SetColor(mainColor)
-		elem := s.Elems.getForDraw(s.selected)
-		if len(elem.content) > 0 {
-			ctx.DrawString(elem.content, radius, (h-float64(elem.h))/2+float64(elem.h))
-			ctx.Stroke()
-		}
-		ctx.DrawCircle(w-radius, radius, mtDropboxScroolWidth/2)
-		ctx.Fill()
-	}
-}
-
 // GUMIFunction / GUMISize 					-> Define
 func (s *MTDropbox) GUMISize() gcore.Size {
 	return gcore.Size{
@@ -244,19 +243,10 @@ func (s *MTDropbox) GUMISize() gcore.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define
-func (s *MTDropbox) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
-	s.frame = frame
-}
-
-// GUMIRenderer / GUMIUpdate 				-> Define
-func (s *MTDropbox) GUMIUpdate() {
-	// TODO
-	panic("implement me")
-}
-
-// GUMIRenderer / GUMIDraw 					-> Define
-func (s *MTDropbox) GUMIDraw() {
-	s.GUMIRender(s.frame)
+func (s *MTDropbox) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
+	s.rmana = man
+	s.rnode = man.New(parent, nil)
+	s.rnode.SetJob(s)
 }
 
 // GUMIEventer / GUMIHappen					-> Define
@@ -280,7 +270,7 @@ func (s *MTDropbox) GUMIHappen(event Event) {
 					s.stretch.To = float64(s.boxHeight - s.boxCut)
 					s.scr.hookRequest(s.hookid, func(event Event) Event {
 						if v, ok := event.(EventCursor); ok {
-							bd := s.bound
+							bd := s.rnode.GetAllocation()
 							bd.Max.Y = bd.Max.Y + s.boxHeight - s.boxCut
 							if bd.Min.X <= int(v.X) && int(v.X) < bd.Max.X && bd.Min.Y <= int(v.Y) && int(v.Y) < bd.Max.Y {
 								s.GUMIHappen(event)
@@ -313,7 +303,7 @@ func (s *MTDropbox) GUMIHappen(event Event) {
 	case EventCursor:
 		x := int(ev.X)
 		y := int(ev.Y)
-		bd := s.bound
+		bd := s.rnode.GetAllocation()
 		if !s.active {
 			if (bd.Min.X <= x && x < bd.Max.X) && (bd.Min.Y <= y && y < bd.Max.Y) {
 				s.cursorEnter = true
@@ -324,8 +314,8 @@ func (s *MTDropbox) GUMIHappen(event Event) {
 			bd.Max.Y += s.boxHeight - s.boxCut
 			if (bd.Min.X <= x && x < bd.Max.X) && (bd.Min.Y <= y && y < bd.Max.Y) {
 				s.cursorEnter = true
-				sum := s.bound.Max.Y + mtDropboxElemMargin
-				if y >= s.bound.Max.Y {
+				sum := s.rnode.GetAllocation().Max.Y + mtDropboxElemMargin
+				if y >= s.rnode.GetAllocation().Max.Y {
 					for i, elem := range s.Elems.refer() {
 						if sum <= y+int(s.scroll.Value()) && y+int(s.scroll.Value()) < sum+elem.h+mtDropboxElemMargin {
 							s.hover = i

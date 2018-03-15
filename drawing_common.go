@@ -64,7 +64,7 @@ func (s *fpsDrawer) Draw(context *gg.Context, style *Style) image.Rectangle {
 func (s *fpsDrawer) Inform(info Information) (changed bool) {
 	s.dts[s.i] = float64(info.Dt)
 	s.i = (s.i + 1) % fpsDrawerHistory
-	if s.c < fpsDrawerHistory{
+	if s.c < fpsDrawerHistory {
 		s.c += 1
 	}
 	if s.i == 0 {

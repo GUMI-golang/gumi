@@ -2,15 +2,15 @@ package gumi
 
 import (
 	"fmt"
-	"github.com/fogleman/gg"
-	"image"
 	"github.com/GUMI-golang/gumi/gcore"
 	"github.com/GUMI-golang/gumi/renderline"
+	"github.com/fogleman/gg"
+	"image"
 )
 
 // MTButton Default Values
 const (
-	mtButtonMinPadding = 5
+	mtButtonMinPadding      = 5
 	mtButtonAnimDeltaMillis = 250
 )
 
@@ -33,7 +33,7 @@ type (
 		//
 		mtColorSingle
 		studio *gcore.Studio
-		hover *gcore.Percenting
+		hover  *gcore.Percenting
 		//
 		text string
 		//
@@ -47,8 +47,6 @@ type (
 	// When Cursor click occur this
 	MTButtonClick func(self *MTButton)
 )
-
-
 
 func (s *MTButton) BaseRender(subimg *image.RGBA) {
 	var ctx = createContext(subimg)
@@ -102,7 +100,7 @@ func (s *MTButton) GUMIInit() {
 
 // GUMIFunction / GUMIInfomation 			-> Define
 func (s *MTButton) GUMIInfomation(info Information) {
-	if s.studio.Animate(float64(info.Dt)){
+	if s.studio.Animate(float64(info.Dt)) {
 		s.rnode.ThrowCache()
 	}
 }
@@ -111,8 +109,6 @@ func (s *MTButton) GUMIInfomation(info Information) {
 func (s *MTButton) GUMIStyle(style *Style) {
 	s.style = style
 }
-
-
 
 // GUMIFunction / GUMISize 					-> Define
 func (s *MTButton) GUMISize() gcore.Size {
@@ -141,7 +137,6 @@ func (s *MTButton) GUMIRenderSetup(man *renderline.Manager, parent renderline.No
 	s.rnode = man.New(parent, nil)
 	s.rnode.SetJob(s)
 }
-
 
 // GUMIEventer / GUMIHappen					-> Define
 func (s *MTButton) GUMIHappen(event Event) {

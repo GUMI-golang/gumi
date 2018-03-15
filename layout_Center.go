@@ -2,9 +2,9 @@ package gumi
 
 import (
 	"fmt"
-	"image"
-	"github.com/GUMI-golang/gumi/renderline"
 	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
+	"image"
 )
 
 // Layout::Center
@@ -29,8 +29,7 @@ func (s *LCenter) GUMIStyle(style *Style) {
 	s.child.GUMIStyle(style)
 }
 
-
-func (s *LCenter) clipsize(r image.Rectangle) image.Rectangle{
+func (s *LCenter) clipsize(r image.Rectangle) image.Rectangle {
 	sz := s.child.GUMISize()
 	var vert, hori int
 	if int(sz.Vertical.Max) < r.Dy() {

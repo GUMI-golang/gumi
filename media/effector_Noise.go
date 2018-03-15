@@ -2,8 +2,8 @@ package media
 
 import (
 	"image/draw"
-	"math/rand"
 	"math"
+	"math/rand"
 	"sync"
 )
 
@@ -13,7 +13,7 @@ type Noise struct {
 
 func NewNoise(intense float64) *Noise {
 	return &Noise{
-		Intense:intense,
+		Intense: intense,
 	}
 }
 
@@ -26,11 +26,11 @@ func (s Noise) Draw(target draw.Image) {
 		wg.Add(1)
 		go func(y int) {
 			for x := dst.Rect.Min.X; x < dst.Rect.Max.X; x++ {
-				offset := dst.PixOffset(x,y)
-				delta :=  noiseGausian(s.Intense)
-				dst.Pix[offset+R] = uint8(clamp(delta + float64(dst.Pix[offset+R]), 0, math.MaxUint8))
-				dst.Pix[offset+G] = uint8(clamp(delta + float64(dst.Pix[offset+G]), 0, math.MaxUint8))
-				dst.Pix[offset+B] = uint8(clamp(delta + float64(dst.Pix[offset+B]), 0, math.MaxUint8))
+				offset := dst.PixOffset(x, y)
+				delta := noiseGausian(s.Intense)
+				dst.Pix[offset+R] = uint8(clamp(delta+float64(dst.Pix[offset+R]), 0, math.MaxUint8))
+				dst.Pix[offset+G] = uint8(clamp(delta+float64(dst.Pix[offset+G]), 0, math.MaxUint8))
+				dst.Pix[offset+B] = uint8(clamp(delta+float64(dst.Pix[offset+B]), 0, math.MaxUint8))
 			}
 			wg.Done()
 		}(y)
@@ -38,6 +38,5 @@ func (s Noise) Draw(target draw.Image) {
 	wg.Wait()
 }
 func noiseGausian(intense float64) float64 {
-	return rand.NormFloat64()*intense
+	return rand.NormFloat64() * intense
 }
-

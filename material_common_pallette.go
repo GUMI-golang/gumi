@@ -1,14 +1,14 @@
 package gumi
 
 import (
+	"github.com/GUMI-golang/gumi/media"
 	"image"
 	"image/color"
-	"github.com/GUMI-golang/gumi/media"
 )
 
 type _MaterialPallette struct {
 	background color.Color
-	silluet color.Color
+	silluet    color.Color
 
 	White  *MaterialColor
 	Red    *MaterialColor
@@ -16,6 +16,7 @@ type _MaterialPallette struct {
 	Blue   *MaterialColor
 	Yellow *MaterialColor
 }
+
 func (s _MaterialPallette) BackgroundColor() color.Color {
 	return s.background
 }
@@ -34,10 +35,12 @@ func (s _MaterialPallette) SilluetImage() image.Image {
 func (s _MaterialPallette) SilluetDrawer() media.Drawer {
 	return media.NewUniform(s.silluet)
 }
+
 type MaterialColor struct {
 	name     string
 	colorset [2]color.Color
 }
+
 func (s MaterialColor) String() string {
 	return s.name
 }

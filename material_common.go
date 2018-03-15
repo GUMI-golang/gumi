@@ -6,9 +6,9 @@ import (
 
 var Material = _Material{
 	DefaultAnimation: _MaterialAnimation{},
-	Pallette:_MaterialPallette{
+	Pallette: _MaterialPallette{
 		background: color.RGBA{64, 74, 83, 255},
-		silluet: color.RGBA{54, 64, 73, 200},
+		silluet:    color.RGBA{54, 64, 73, 200},
 		White: &MaterialColor{
 			name: "White",
 			colorset: [2]color.Color{
@@ -49,6 +49,5 @@ var Material = _Material{
 
 type _Material struct {
 	DefaultAnimation _MaterialAnimation
-	Pallette _MaterialPallette
+	Pallette         _MaterialPallette
 }
-

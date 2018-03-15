@@ -1,11 +1,11 @@
 package media
 
 import (
-	"image/draw"
 	"image"
+	"image/draw"
 )
 
-type Drawer interface{
+type Drawer interface {
 	Bound() image.Rectangle
 	Effector
 }

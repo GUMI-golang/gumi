@@ -2,10 +2,10 @@ package gumi
 
 import (
 	"fmt"
-	"image"
 	"github.com/GUMI-golang/gumi/gcore"
-	"github.com/GUMI-golang/gumi/renderline"
 	"github.com/GUMI-golang/gumi/media"
+	"github.com/GUMI-golang/gumi/renderline"
+	"image"
 )
 
 type NBackground struct {
@@ -55,7 +55,7 @@ func (s *NBackground) String() string {
 
 func NBackground0(draw media.Drawer) *NBackground {
 	return &NBackground{
-		drawer:draw,
+		drawer: draw,
 	}
 }
 

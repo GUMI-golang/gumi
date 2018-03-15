@@ -1,10 +1,10 @@
-package temp
+package gumi
 
 import (
 	"fmt"
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
 	"github.com/fogleman/gg"
-	"github.com/iamGreedy/gumi/drawer"
-	"github.com/iamGreedy/gumi/gumre"
 	"image"
 )
 
@@ -13,14 +13,12 @@ const (
 	mtEditMinWidth                    = 80
 	mtEditMinHeight                   = 20
 	mtEditAnimationTextCursorInterval = 400
-	mtEditDeleteInterval              = 50
-	mtEditDeleteThereshold            = 200
 )
-
 
 // MTEdit Animations
 const (
 	mtEditAnimationTextCursor = iota
+	mtEditAnimationDelPercent = iota
 	//
 	mtEditAnimationLength = iota
 )
@@ -28,103 +26,36 @@ const (
 // Material::Edit
 //
 // Material theme editable text
-type MTEdit struct {
-	//
-	VoidNode
-	boundStore
-	styleStore
-	rendererStore
-	//
-	mtColorSingle
-	studio                *gcore.Studio
-	textCursor            *gcore.Switching
-	deleteSum             int64
-	deleteOn              bool
-	deleteCount           int
-	deleteTheresholdStack int64
-	deleteRequestCount    uint
-	keyCTRL               bool
-	editingRune           rune
-	editingNow            bool
-	//
-	align    gcore.Align
-	text     string
-	inactive bool
-	//
-	onChange            MTEditChange
-	cursorEnter, active bool
-}
-
-// Material::Edit<Callback> -> Change
-//
-// If text changed it occur
-// TODO : CJK Editing change
-type MTEditChange func(self *MTEdit, text string)
-
-
-// GUMIFunction / GUMIInit 					-> Define
-func (s *MTEdit) GUMIInit() {
-	s.studio = gcore.Animation.Studio(mtEditAnimationLength)
-	s.textCursor = s.studio.Set(mtEditAnimationTextCursor, &gcore.Switching{
-		Interval: mtEditAnimationTextCursorInterval,
-	}).(*gcore.Switching)
-}
-
-// GUMIFunction / GUMIInfomation 			-> Define
-func (s *MTEdit) GUMIInfomation(info Information) {
-	s.studio.Animate(float64(info.Dt))
-	if s.deleteRequestCount > 0 {
-		if !s.editingNow {
-			if s.keyCTRL {
-				s.text = StringControlBackSpace(s.text)
-			} else {
-				s.text = StringBackSpace(s.text, 1)
-			}
-		} else {
-			if s.editingRune == 0 {
-				s.editingNow = false
-			}
-		}
-		s.deleteRequestCount = 0
+type (
+	MTEdit struct {
+		//
+		VoidNode
+		styleStore
+		rendererStore
+		//
+		mtColorSingle
+		studio     *gcore.Studio
+		textCursor *gcore.Switching
+		delPercent *mtEditDeleteActor
+		//
+		ctrl        bool
+		//
+		align    gcore.Align
+		text     string
+		editingRune rune
+		inactive bool
+		//
+		onChange            MTEditChange
+		cursorEnter, active bool
 	}
-	s.deleteSum += info.Dt
-	s.deleteTheresholdStack += info.Dt
-	temp := s.deleteSum / mtEditDeleteInterval
-	if temp >= 1 {
-		s.deleteSum -= temp * mtEditDeleteInterval
-		if s.deleteOn && s.deleteTheresholdStack > mtEditDeleteThereshold {
-			if !s.editingNow {
-				for i := int64(0); i < temp; i++ {
-					s.deleteCount += 1
-					if s.keyCTRL {
-						s.text = StringControlBackSpace(s.text)
-					} else {
-						s.text = StringBackSpace(s.text, 1)
-					}
-				}
-			} else {
-				if s.editingRune == 0 {
-					s.editingNow = false
-				}
-			}
-		}
-	}
-}
+	// If text changed it occur
+	MTEditChange func(self *MTEdit, text string)
+	MTEditFocus  func(self *MTEdit, focus bool)
+)
 
-// GUMIFunction / GUMIStyle 				-> Define
-func (s *MTEdit) GUMIStyle(style *Style) {
-	s.style = style
-}
-
-// GUMIFunction / GUMIClip 					-> Define
-func (s *MTEdit) GUMIClip(r image.Rectangle) {
-	s.bound = r
-}
-
-// GUMIFunction / GUMIRender 				-> Define
-func (s *MTEdit) GUMIRender(frame *image.RGBA) {
+func (s *MTEdit) BaseRender(subimg *image.RGBA) {
 	var baseColor, mainColor = s.GetMaterialColor().Color()
-	var ctx = createContextRGBASub(frame, s.bound)
+	var ctx = createContext(subimg)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	var radius = h / 2
 	//
@@ -180,6 +111,53 @@ func (s *MTEdit) GUMIRender(frame *image.RGBA) {
 	ctx.Stroke()
 }
 
+func (s *MTEdit) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
+	return image.ZR
+}
+
+// GUMIFunction / GUMIInit 					-> Define
+func (s *MTEdit) GUMIInit() {
+	s.studio = gcore.Animation.Studio(mtEditAnimationLength)
+	s.textCursor = s.studio.Set(mtEditAnimationTextCursor, &gcore.Switching{
+		Interval: mtEditAnimationTextCursorInterval,
+	}).(*gcore.Switching)
+	s.delPercent = s.studio.Set(mtEditAnimationDelPercent, newMTEditDeleteActor(100, 50)).(*mtEditDeleteActor)
+}
+
+// GUMIFunction / GUMIInfomation 			-> Define
+func (s *MTEdit) GUMIInfomation(info Information) {
+	if s.studio.Animate(float64(info.Dt)) {
+		s.rnode.ThrowCache()
+	}
+	//
+	if s.editingRune == 0 {
+		var dels = s.delPercent.Pop()
+		if dels > 0 {
+			if s.ctrl {
+				// ctrl + backspace
+				temp := StringControlBackSpace(s.text, dels)
+				if s.text != temp {
+					s.emitChange()
+				}
+				s.text = temp
+			} else {
+				// backspace
+				temp := StringBackSpace(s.text, dels)
+				if s.text != temp {
+					s.emitChange()
+				}
+				s.text = temp
+			}
+		}
+
+	}
+}
+
+// GUMIFunction / GUMIStyle 				-> Define
+func (s *MTEdit) GUMIStyle(style *Style) {
+	s.style = style
+}
+
 // GUMIFunction / GUMISize 					-> Define
 func (s *MTEdit) GUMISize() gcore.Size {
 	return gcore.Size{
@@ -197,19 +175,10 @@ func (s *MTEdit) GUMISize() gcore.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define
-func (s *MTEdit) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
-	s.frame = frame
-}
-
-// GUMIRenderer / GUMIUpdate 				-> Define
-func (s *MTEdit) GUMIUpdate() {
-	// TODO
-	panic("implement me")
-}
-
-// GUMIRenderer / GUMIDraw 					-> Define
-func (s *MTEdit) GUMIDraw() {
-	s.GUMIRender(s.frame)
+func (s *MTEdit) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
+	s.rmana = man
+	s.rnode = man.New(parent, nil)
+	s.rnode.SetJob(s)
 }
 
 // GUMIEventer / GUMIHappen					-> Define
@@ -218,61 +187,67 @@ func (s *MTEdit) GUMIHappen(event Event) {
 	case EventKeyPress:
 		switch ev.Key {
 		case KEY_CONTROL:
-			s.keyCTRL = true
-		case KEY_BACKSPACE:
-			if s.active {
-				s.deleteOn = true
-				s.deleteCount = 0
-				s.deleteTheresholdStack = 0
+			if !s.active{
+				return
 			}
+			s.ctrl = true
+		case KEY_BACKSPACE:
+			if !s.active{
+				return
+			}
+			if s.editingRune != 0{
+				return
+			}
+			s.delPercent.Start()
 		}
 	case EventKeyRelease:
 		switch ev.Key {
 		case KEY_CONTROL:
-			s.keyCTRL = false
-		case KEY_BACKSPACE:
-			if s.active {
-				if s.deleteCount == 0 {
-					s.deleteRequest(1)
-				}
-				s.deleteOn = false
-				s.deleteCount = 0
-				s.deleteTheresholdStack = 0
+			if !s.active{
+				return
 			}
+			s.ctrl = false
+		case KEY_BACKSPACE:
+			if !s.active{
+				return
+			}
+			s.delPercent.Reset()
 		case KEY_MOUSE1:
 			if s.cursorEnter {
 				if !s.inactive {
 					s.active = true
+					s.rnode.ThrowCache()
 				}
-
 			} else {
 				s.active = false
-				s.deleteOn = false
-				s.deleteCount = 0
+				s.rnode.ThrowCache()
 			}
 		}
 	case EventCursor:
 		x := int(ev.X)
 		y := int(ev.Y)
-		if (s.bound.Min.X <= x && x < s.bound.Max.X) && (s.bound.Min.Y <= y && y < s.bound.Max.Y) {
+		bd := s.rnode.GetAllocation()
+		if (bd.Min.X <= x && x < bd.Max.X) && (bd.Min.Y <= y && y < bd.Max.Y) {
 			s.cursorEnter = true
 		} else {
 			s.cursorEnter = false
+
 		}
 	case EventRuneEdit:
-		if s.active {
-			s.editingRune = ev.Rune
-			s.editingNow = true
+		if !s.active{
+			return
 		}
+		s.editingRune = ev.Rune
+		s.rnode.ThrowCache()
+		s.emitChange()
 	case EventRuneComplete:
-		if s.active {
-			s.editingRune = 0
-			s.editingNow = false
-			s.text += string(ev.Rune)
-			if s.onChange != nil {
-				s.onChange(s, s.text)
-			}
+		if !s.active{
+			return
 		}
+		s.editingRune = 0
+		s.text += string(ev.Rune)
+		s.rnode.ThrowCache()
+		s.emitChange()
 	}
 
 }
@@ -280,11 +255,6 @@ func (s *MTEdit) GUMIHappen(event Event) {
 // fmt.Stringer / String					-> Define
 func (s *MTEdit) String() string {
 	return fmt.Sprintf("%s(text:%s)", "MTEdit", s.text)
-}
-
-//
-func (s *MTEdit) deleteRequest(count uint) {
-	s.deleteRequestCount += count
 }
 
 // Constructors 0
@@ -340,9 +310,8 @@ func (s *MTEdit) Get() string {
 // Method / Set
 func (s *MTEdit) SetText(str string) {
 	s.text = str
-	if s.onChange != nil {
-		s.onChange(s, s.text)
-	}
+	s.rnode.ThrowCache()
+	s.emitChange()
 }
 
 // Method / Get
@@ -378,4 +347,14 @@ func (s *MTEdit) OnChange(callback MTEditChange) {
 // Method / Get Callback
 func (s *MTEdit) ReferChange() MTEditChange {
 	return s.onChange
+}
+
+func (s *MTEdit) emitChange() {
+	if s.onChange != nil{
+		if s.editingRune != 0{
+			s.onChange(s, s.text + string(s.editingRune))
+		}else {
+			s.onChange(s, s.text)
+		}
+	}
 }

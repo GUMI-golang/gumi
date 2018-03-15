@@ -135,7 +135,7 @@ func resize(dst *image.RGBA, src *image.RGBA, support float64, fn func(x float64
 				var r, g, b, a float64
 				var sum float64
 				//
-				h, v := memorizationW[x - dst.Rect.Min.X], memorizationH[y - dst.Rect.Min.Y]
+				h, v := memorizationW[x-dst.Rect.Min.X], memorizationH[y-dst.Rect.Min.Y]
 				// H : pixel evaluate
 				for kx := h.start; kx < h.end; kx++ {
 					srcoffset := src.PixOffset(kx, int(v.val))

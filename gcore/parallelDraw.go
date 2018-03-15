@@ -2,8 +2,8 @@ package gcore
 
 import (
 	"image"
-	"sync"
 	"image/draw"
+	"sync"
 )
 
 const m = 1<<16 - 1
@@ -13,6 +13,7 @@ var wgpool = &sync.Pool{
 		return new(sync.WaitGroup)
 	},
 }
+
 func clip(dst image.Rectangle, r *image.Rectangle, src image.Rectangle, sp *image.Point) {
 	orig := r.Min
 	*r = r.Intersect(dst)
@@ -25,7 +26,7 @@ func clip(dst image.Rectangle, r *image.Rectangle, src image.Rectangle, sp *imag
 	sp.X += dx
 	sp.Y += dy
 }
-func ParallelDraw(dst *image.RGBA, r image.Rectangle, src *image.RGBA, sp image.Point, method draw.Op){
+func ParallelDraw(dst *image.RGBA, r image.Rectangle, src *image.RGBA, sp image.Point, method draw.Op) {
 	switch method {
 	case draw.Src:
 		ParallelDrawSrc(dst, r, src, sp)
@@ -90,7 +91,6 @@ func ParallelDrawOver(dst *image.RGBA, r image.Rectangle, src *image.RGBA, sp im
 		i0, i1, idelta = (dx-1)*4, -4, -4
 	}
 
-
 	wg.Add(dy)
 	for ; dy > 0; dy-- {
 		go func(d, s int) {
@@ -122,4 +122,3 @@ func ParallelDrawOver(dst *image.RGBA, r image.Rectangle, src *image.RGBA, sp im
 	}
 	wg.Wait()
 }
-

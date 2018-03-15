@@ -1,31 +1,31 @@
 package gumi
 
 import (
+	"github.com/GUMI-golang/gumi/gcore"
 	"github.com/fogleman/gg"
 	"github.com/iamGreedy/freetype"
+	"github.com/iamGreedy/freetype/truetype"
 	"golang.org/x/image/font/gofont/goregular"
 	"sync"
-	"github.com/iamGreedy/freetype/truetype"
-	"github.com/GUMI-golang/gumi/gcore"
 )
 
 type Style struct {
-	Default  StyleDefault
-	Map      map[string]interface{}
+	Default StyleDefault
+	Map     map[string]interface{}
 }
 
 func (s *Style) Equare(e *Style) bool {
 	if s == e {
 		return true
 	}
-	if s.Default.Font != e.Default.Font{
+	if s.Default.Font != e.Default.Font {
 		return false
 	}
-	if s.Default.LineWidth != e.Default.LineWidth{
+	if s.Default.LineWidth != e.Default.LineWidth {
 		return false
 	}
-	for k, v := range s.Map{
-		if ev, eok := e.Map[k]; !eok || ev != v{
+	for k, v := range s.Map {
+		if ev, eok := e.Map[k]; !eok || ev != v {
 			return false
 		}
 	}

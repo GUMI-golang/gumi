@@ -1,10 +1,10 @@
 package gumi
 
 import (
-	"image"
 	"fmt"
 	"github.com/GUMI-golang/gumi/gcore"
 	"github.com/GUMI-golang/gumi/renderline"
+	"image"
 )
 
 // Layout::Horizontal
@@ -20,25 +20,24 @@ type LVertical struct {
 
 // GUMIFunction / GUMIInfomation 			-> Define
 func (s *LVertical) GUMIInfomation(info Information) {
-	for _, v := range s.child{
+	for _, v := range s.child {
 		v.GUMIInfomation(info)
 	}
 }
 
 // GUMIFunction / GUMIStyle 				-> Define
 func (s *LVertical) GUMIStyle(style *Style) {
-	for _, v := range s.child{
+	for _, v := range s.child {
 		v.GUMIStyle(style)
 	}
 }
 
-
 // GUMIFunction / GUMISize 					-> Define
 func (s *LVertical) GUMISize() gcore.Size {
 	var minMax, sum uint16 = 0, 0
-	for _, v := range s.child{
+	for _, v := range s.child {
 		sz := v.GUMISize()
-		if sz.Horizontal.Min > minMax{
+		if sz.Horizontal.Min > minMax {
 			minMax = sz.Horizontal.Min
 		}
 		sum += sz.Vertical.Min
@@ -65,19 +64,19 @@ func (s *LVertical) GUMIRenderSetup(man *renderline.Manager, parent renderline.N
 	// 렌더링 영역 할당
 	var tempVert = make([]gcore.Length, len(s.child))
 	var tempHori = make([]gcore.Length, len(s.child))
-	for i, v := range s.child{
+	for i, v := range s.child {
 		tempVert[i] = v.GUMISize().Vertical
 		tempHori[i] = v.GUMISize().Horizontal
 	}
 	dis := s.rule(rnodealloc.Dy(), tempVert)
 	//
 	var startat = rnodealloc.Min.Y
-	for i, v := range s.child{
+	for i, v := range s.child {
 		inrect := image.Rect(
 			rnodealloc.Min.X,
 			startat,
 			rnodealloc.Max.X,
-			startat + dis[i],
+			startat+dis[i],
 		)
 		temp := s.rmana.New(s.rnode, nil)
 		temp.SetAllocation(inrect)
@@ -88,13 +87,13 @@ func (s *LVertical) GUMIRenderSetup(man *renderline.Manager, parent renderline.N
 
 // GUMIEventer / GUMIHappen					-> Define
 func (s *LVertical) GUMIHappen(event Event) {
-	for _, v := range s.child{
+	for _, v := range s.child {
 		go v.GUMIHappen(event)
 	}
 }
 
 // fmt.Stringer / String					-> Define
-func (s *LVertical) String() string{
+func (s *LVertical) String() string {
 	return fmt.Sprintf(
 		"%s(childrun:%d)", "LVertical", len(s.Childrun()),
 	)
@@ -103,9 +102,9 @@ func (s *LVertical) String() string{
 // Constructor 0
 func LVertical0(rule gcore.Distribute, childrun ...GUMI) *LVertical {
 	s := &LVertical{
-		rule:rule,
+		rule: rule,
 	}
-	for _, v := range childrun{
+	for _, v := range childrun {
 		v.born(s)
 	}
 	s.breed(childrun)
@@ -117,7 +116,7 @@ func LVertical1(childrun ...GUMI) *LVertical {
 	s := &LVertical{
 		rule: gcore.Distribution.Minimalize,
 	}
-	for _, v := range childrun{
+	for _, v := range childrun {
 		v.born(s)
 	}
 	s.breed(childrun)

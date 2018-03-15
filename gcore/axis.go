@@ -14,6 +14,7 @@ func (s Axis) String() string {
 		return "Both"
 	}
 }
+
 const (
 	AxisVertical   Axis = 1 << iota
 	AxisHorizontal Axis = 1 << iota

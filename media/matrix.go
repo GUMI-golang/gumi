@@ -1,8 +1,8 @@
 package media
 
 import (
-	"math"
 	"fmt"
+	"math"
 )
 
 type Matrix [][]float64
@@ -16,18 +16,18 @@ func NewMatrix(w, h int) Matrix {
 }
 func (s Matrix) String() (res string) {
 	var w, h = s.Size()
-	for y := 0; y < h; y ++{
-		for x := 0; x < w; x ++{
+	for y := 0; y < h; y++ {
+		for x := 0; x < w; x++ {
 			res += fmt.Sprintf("%6.2f ", s[x][y])
 		}
 		res += "\n"
 	}
 	return res
 }
-func (s *Matrix) Clear(clearValue float64){
+func (s *Matrix) Clear(clearValue float64) {
 	w, h := s.Size()
-	for x := 0; x < w; x ++{
-		for y := 0; y < h; y ++{
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
 			(*s)[x][y] = clearValue
 		}
 	}

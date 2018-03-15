@@ -8,7 +8,7 @@ type Node interface {
 	setParent(n Node)
 	Childrun() []Node
 	appendChildrun(c ...Node)
-	clearChildrun(c ...Node)
+	clearChildrun()
 	Setup()
 	BaseRender()
 	DecalRender(updated *image.Rectangle)

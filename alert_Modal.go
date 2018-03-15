@@ -1,9 +1,9 @@
 package gumi
 
 import (
-	"github.com/GUMI-golang/gumi/renderline"
-	"github.com/GUMI-golang/gumi/gcore"
 	"fmt"
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
 )
 
 // ALert::Modal
@@ -13,7 +13,7 @@ type ALModal struct {
 	SingleNode
 	//
 	rmana *renderline.Manager
-	rnode *renderline.SelectNode
+	rnode *renderline.SilluetNode
 	//
 	lastCursorEvent EventCursor
 	//
@@ -54,19 +54,17 @@ func (s *ALModal) GUMISize() gcore.Size {
 // GUMIRenderer / GUMIRenderSetup			-> Define
 func (s *ALModal) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 	s.rmana = man
-	s.rnode = man.New(parent, renderline.NewSelectNode(2)).(*renderline.SelectNode)
-	s.rnode.Select(renderline.NewSelects(0))
-	s.child.GUMIRenderSetup(man, s.rnode)
-	s.rnode.Select(renderline.NewSelects(1))
-	s.modal.GUMIRenderSetup(man, s.rnode)
-	s.rnode.Select(renderline.NewSelects(0))
+	s.rnode = man.New(parent, renderline.NewSilluetNode()).(*renderline.SilluetNode)
+
+	s.child.GUMIRenderSetup(man, s.rnode.Childrun()[0])
+	s.modal.GUMIRenderSetup(man, s.rnode.Childrun()[1])
 }
 
 // GUMIEventer / GUMIHappen					-> Define
 func (s *ALModal) GUMIHappen(event Event) {
-	if s.rnode.GetSelected().Check(1){
+	if s.rnode.IsEnable() {
 		s.modal.GUMIHappen(event)
-	}else {
+	} else {
 		if event.Kind() == EVENT_CURSOR {
 			s.lastCursorEvent = event.(EventCursor)
 		}
@@ -88,45 +86,45 @@ func ALModal0() *ALModal {
 // Constructor 1
 func ALModal1(modal GUMI) *ALModal {
 	temp := ALModal{
-		modal:modal,
+		modal: modal,
 	}
 	modal.born(&temp)
 	return &temp
 }
 
 // Method / SetShow
-func (s *ALModal ) Set(show bool)  {
+func (s *ALModal) Set(show bool) {
 	s.SetShow(show)
 }
 
 // Method / GetShow
-func (s *ALModal ) Get() bool {
+func (s *ALModal) Get() bool {
 	return s.GetShow()
 }
 
 // Method / SetModal
-func (s *ALModal ) SetModal(modal GUMI)  {
+func (s *ALModal) SetModal(modal GUMI) {
 	s.modal = modal
 	modal.born(s)
 }
 
 // Method / GetModal
-func (s *ALModal ) GetModal() GUMI {
+func (s *ALModal) GetModal() GUMI {
 	return s.modal
 }
 
 // Method / SetShow
-func (s *ALModal ) SetShow(show bool)  {
+func (s *ALModal) SetShow(show bool) {
 	s.modal.GUMIHappen(s.lastCursorEvent)
-	if show{
-		s.rnode.Select(renderline.NewSelects(0, 1))
-	}else {
-		s.rnode.Select(renderline.NewSelects(0))
+	if show {
+		s.rnode.Enable()
+	} else {
+		s.rnode.Disable()
 	}
 	s.rnode.ThrowCache()
 }
 
 // Method / GetShow
-func (s *ALModal ) GetShow() bool {
-	return s.rnode.GetSelected().Check(1)
+func (s *ALModal) GetShow() bool {
+	return s.rnode.IsEnable()
 }

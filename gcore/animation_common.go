@@ -1,6 +1,7 @@
 package gcore
 
 var Animation _Animation
+
 type _Animation struct {
 	Functions _AnimationFunctions
 }

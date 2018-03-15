@@ -2,8 +2,8 @@ package gumi
 
 import (
 	"fmt"
-	"github.com/GUMI-golang/gumi/renderline"
 	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
 )
 
 // _::Root
@@ -31,7 +31,6 @@ func (s *gumiRoot) GUMISize() gcore.Size {
 	return s.child.GUMISize()
 }
 
-
 // GUMITree / born 							-> SingleNode::Default
 
 // GUMITree / breed 						-> SingleNode::Default
@@ -39,7 +38,6 @@ func (s *gumiRoot) GUMISize() gcore.Size {
 // GUMITree / parent()						-> SingleNode::Default
 
 // GUMITree / childrun()					-> SingleNode::Default
-
 
 // GUMIRenderer / GUMIRenderSetup			-> Define::Empty
 func (s *gumiRoot) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
@@ -50,7 +48,6 @@ func (s *gumiRoot) GUMIRenderSetup(man *renderline.Manager, parent renderline.No
 func (s *gumiRoot) GUMIHappen(event Event) {
 	s.child.GUMIHappen(event)
 }
-
 
 func (s *gumiRoot) String() string {
 	return fmt.Sprintf("%s", "GUMI Root")
@@ -72,10 +69,10 @@ func newGUMIRoot(scr *Screen, under GUMI) GUMIRoot {
 
 // Utility Function
 func Root(g GUMI) GUMIRoot {
-	if g == nil{
+	if g == nil {
 		return nil
 	}
-	if v, ok := g.(*gumiRoot); ok{
+	if v, ok := g.(*gumiRoot); ok {
 		return v
 	}
 	return Root(g.Parent())
