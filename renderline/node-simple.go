@@ -82,10 +82,10 @@ func (s *SimpleNode) childrunDecalRender(updated *image.Rectangle) {
 	//
 	wg.Add(len(s.childrun))
 	for _, child := range s.childrun {
-		go func() {
-			child.DecalRender(updated)
+		go func(ch Node) {
+			ch.DecalRender(updated)
 			wg.Done()
-		}()
+		}(child)
 	}
 	wg.Wait()
 }
@@ -126,7 +126,7 @@ func (s *SimpleNode) setParent(n Node) {
 func (s *SimpleNode) appendChildrun(c ...Node) {
 	s.childrun = append(s.childrun, c...)
 }
-func (s *SimpleNode) clearChildrun(c ...Node) {
+func (s *SimpleNode) clearChildrun() {
 	s.childrun = nil
 }
 

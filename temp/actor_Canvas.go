@@ -2,11 +2,11 @@ package temp
 
 import (
 	"fmt"
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/media"
 	"github.com/iamGreedy/gumi/drawer"
 	"github.com/iamGreedy/gumi/gumre"
 	"image"
-	"github.com/GUMI-golang/gumi/gcore"
-	"github.com/GUMI-golang/gumi/media"
 )
 
 // Actor::Canvas
@@ -29,7 +29,7 @@ func (s *ACanvas) GUMIInfomation(info Information) {
 
 // GUMIFunction / GUMIStyle					-> Define
 func (s *ACanvas) GUMIStyle(style *Style) {
-	if s.style != style{
+	if s.style != style {
 		s.style = style
 		s.rnode.Require()
 	}
@@ -76,8 +76,8 @@ func (s *ACanvas) GUMIDraw() {
 }
 
 // GUMIRenderer / GUMIRenderSetup			-> Define
-func (s *ACanvas ) GUMIUpdate()  {
-	if s.rnode.Check(){
+func (s *ACanvas) GUMIUpdate() {
+	if s.rnode.Check() {
 		s.GUMIDraw()
 	}
 }
@@ -90,7 +90,6 @@ func (s *ACanvas) GUMIHappen(event Event) {
 func (s *ACanvas) String() string {
 	return fmt.Sprintf("%s", "ACanvas")
 }
-
 
 // Constructor
 func ACanvas0(w, h uint16, fn Drawer) *ACanvas {

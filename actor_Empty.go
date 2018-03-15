@@ -23,7 +23,6 @@ func (s AEmpty) GUMIInfomation(info Information) {
 func (s AEmpty) GUMIStyle(style *Style) {
 }
 
-
 // GUMIFunction / GUMISize 			-> Define
 func (AEmpty) GUMISize() gcore.Size {
 	return gcore.Size{

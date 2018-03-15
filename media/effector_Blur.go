@@ -1,30 +1,31 @@
 package media
 
 import (
+	"image"
 	"image/draw"
 	"math"
 	"sync"
-	"image"
 )
 
 const (
-	BlurBox BlurMode = iota
+	BlurBox      BlurMode = iota
 	BlurGaussian BlurMode = iota
 )
+
 type BlurMode uint8
 
 type Blur struct {
-	Radius float64
+	Radius    float64
 	KeepAlpha bool
-	Mode BlurMode
+	Mode      BlurMode
 }
 
 func NewBlur(Radius float64, KeepAlpha bool, Mode BlurMode) *Blur {
 
 	return &Blur{
-		Radius:Radius,
-		KeepAlpha:KeepAlpha,
-		Mode:Mode,
+		Radius:    Radius,
+		KeepAlpha: KeepAlpha,
+		Mode:      Mode,
 	}
 }
 func (s Blur) Draw(target draw.Image) {
@@ -34,24 +35,24 @@ func (s Blur) Draw(target draw.Image) {
 	default:
 		fallthrough
 	case BlurBox:
-		if s.KeepAlpha{
+		if s.KeepAlpha {
 			boxBlurKeepAlpha(pix, s.Radius)
-		}else {
+		} else {
 			boxBlur(pix, s.Radius)
 		}
 	case BlurGaussian:
-		if s.KeepAlpha{
+		if s.KeepAlpha {
 			boxGaussianKeepAlpha(pix, s.Radius)
-		}else {
+		} else {
 			boxGaussian(pix, s.Radius)
 		}
 
 	}
 }
 
-func boxBlur(src *image.RGBA, radius float64)  {
+func boxBlur(src *image.RGBA, radius float64) {
 	var length = int(math.Ceil(radius)) + 1
-	var rad = length/2
+	var rad = length / 2
 	var mat = NewMatrix(length, length)
 	mat.Clear(1)
 	mat = mat.Normal()
@@ -87,9 +88,9 @@ func boxBlur(src *image.RGBA, radius float64)  {
 	}
 	wg.Wait()
 }
-func boxBlurKeepAlpha(src *image.RGBA, radius float64)  {
+func boxBlurKeepAlpha(src *image.RGBA, radius float64) {
 	var length = int(math.Ceil(radius)) + 1
-	var rad = length/2
+	var rad = length / 2
 	var mat = NewMatrix(length, length)
 	mat.Clear(1)
 	mat = mat.Normal()
@@ -126,9 +127,9 @@ func boxBlurKeepAlpha(src *image.RGBA, radius float64)  {
 func gaussian(x, y, sigma float64) float64 {
 	return math.Exp(-(x*x/sigma + y*y/sigma))
 }
-func boxGaussian(src *image.RGBA, radius float64)  {
+func boxGaussian(src *image.RGBA, radius float64) {
 	var length = int(math.Ceil(radius)) + 1
-	var rad = length/2
+	var rad = length / 2
 	var mat = NewMatrix(length, length)
 	for x := 0; x < length; x++ {
 		for y := 0; y < length; y++ {
@@ -167,9 +168,9 @@ func boxGaussian(src *image.RGBA, radius float64)  {
 	}
 	wg.Wait()
 }
-func boxGaussianKeepAlpha(src *image.RGBA, radius float64)  {
+func boxGaussianKeepAlpha(src *image.RGBA, radius float64) {
 	var length = int(math.Ceil(radius)) + 1
-	var rad = length/2
+	var rad = length / 2
 	var mat = NewMatrix(length, length)
 	for x := 0; x < length; x++ {
 		for y := 0; y < length; y++ {

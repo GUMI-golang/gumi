@@ -48,10 +48,10 @@ func (s Repeat) Draw(dst draw.Image) {
 				draw.Draw(
 					dst,
 					image.Rect(
-						dstsz.Min.X + hidx*srcw,
-						dstsz.Min.Y + vidx*srch,
-						dstsz.Min.X + (hidx + 1)*srcw,
-						dstsz.Min.Y + (vidx + 1)*srch,
+						dstsz.Min.X+hidx*srcw,
+						dstsz.Min.Y+vidx*srch,
+						dstsz.Min.X+(hidx+1)*srcw,
+						dstsz.Min.Y+(vidx+1)*srch,
 					),
 					s.src,
 					s.src.Rect.Min,
@@ -64,10 +64,10 @@ func (s Repeat) Draw(dst draw.Image) {
 			draw.Draw(
 				dst,
 				image.Rect(
-					dstsz.Min.X + hidx*srcw,
+					dstsz.Min.X+hidx*srcw,
 					dstsz.Min.Y,
-					dstsz.Min.X + (hidx + 1)*srcw,
-					dstsz.Min.Y + srch,
+					dstsz.Min.X+(hidx+1)*srcw,
+					dstsz.Min.Y+srch,
 				),
 				s.src,
 				s.src.Rect.Min,
@@ -80,9 +80,9 @@ func (s Repeat) Draw(dst draw.Image) {
 				dst,
 				image.Rect(
 					dstsz.Min.X,
-					dstsz.Min.Y + vidx*srch,
-					dstsz.Min.X + srcw,
-					dstsz.Min.Y + (vidx + 1)*srch,
+					dstsz.Min.Y+vidx*srch,
+					dstsz.Min.X+srcw,
+					dstsz.Min.Y+(vidx+1)*srch,
 				),
 				s.src,
 				s.src.Rect.Min,

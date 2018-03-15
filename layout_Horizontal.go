@@ -1,11 +1,10 @@
-package temp
+package gumi
 
 import (
 	"fmt"
-	"github.com/iamGreedy/gumi/gumre"
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
 	"image"
-	"sync"
-	"github.com/iamGreedy/gumi/drawer"
 )
 
 // Layout::Horizontal
@@ -13,6 +12,7 @@ import (
 // Horizontal align
 type LHorizontal struct {
 	MultipleNode
+	rendererStore
 	rule gcore.Distribute
 }
 
@@ -33,33 +33,29 @@ func (s *LHorizontal) GUMIStyle(style *Style) {
 }
 
 // GUMIFunction / GUMIClip 					-> Define
-func (s *LHorizontal) GUMIClip(r image.Rectangle) {
-	//
-	var tempVert = make([]gcore.Length, len(s.child))
-	var tempHori = make([]gcore.Length, len(s.child))
-
-	for i, v := range s.child {
-		tempVert[i] = v.GUMISize().Vertical
-		tempHori[i] = v.GUMISize().Horizontal
-	}
-	dis := s.rule(r.Dx(), tempHori)
-	//
-	var startat = r.Min.X
-	for i, v := range s.child {
-		r := image.Rect(
-			startat,
-			r.Min.Y,
-			startat+dis[i],
-			r.Max.Y,
-		)
-		v.GUMIClip(r)
-		startat += dis[i]
-	}
-}
-
-// GUMIFunction / GUMIRender 				-> Define::Empty
-func (s *LHorizontal) GUMIRender(frame *image.RGBA) {
-}
+//func (s *LHorizontal) GUMIClip(r image.Rectangle) {
+//	//
+//	var tempVert = make([]gcore.Length, len(s.child))
+//	var tempHori = make([]gcore.Length, len(s.child))
+//
+//	for i, v := range s.child {
+//		tempVert[i] = v.GUMISize().Vertical
+//		tempHori[i] = v.GUMISize().Horizontal
+//	}
+//	dis := s.rule(r.Dx(), tempHori)
+//	//
+//	var startat = r.Min.X
+//	for i, v := range s.child {
+//		r := image.Rect(
+//			startat,
+//			r.Min.Y,
+//			startat+dis[i],
+//			r.Max.Y,
+//		)
+//		v.GUMIClip(r)
+//		startat += dis[i]
+//	}
+//}
 
 // GUMIFunction / GUMISize 					-> Define
 func (s *LHorizontal) GUMISize() gcore.Size {
@@ -86,28 +82,35 @@ func (s *LHorizontal) GUMISize() gcore.Size {
 // GUMITree / childrun()					-> MultipleNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define
-func (s *LHorizontal) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
-	for _, v := range s.child {
-		v.GUMIRenderSetup(frame, tree, parentnode)
-	}
-}
+func (s *LHorizontal) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
+	s.rmana = man
+	s.rnode = man.New(parent, nil)
 
-// GUMIRenderer / GUMIDraw 					-> Define
-func (s *LHorizontal) GUMIDraw() {
-	wg := new(sync.WaitGroup)
-	wg.Add(len(s.child))
-	defer wg.Wait()
-	for _, v := range s.child {
-		go func(elem GUMI) {
-			elem.GUMIDraw()
-			wg.Done()
-		}(v)
-	}
-}
+	var rnodealloc = s.rnode.GetAllocation()
+	//
+	var tempVert = make([]gcore.Length, len(s.child))
+	var tempHori = make([]gcore.Length, len(s.child))
 
-// GUMIRenderer / GUMIUpdate				-> Define
-func (s *LHorizontal) GUMIUpdate() {
-	panic("implement me")
+	for i, v := range s.child {
+		tempVert[i] = v.GUMISize().Vertical
+		tempHori[i] = v.GUMISize().Horizontal
+	}
+	dis := s.rule(rnodealloc.Dx(), tempHori)
+	//
+	var startat = rnodealloc.Min.X
+	for i, v := range s.child {
+		inrect := image.Rect(
+			startat,
+			rnodealloc.Min.Y,
+			startat+dis[i],
+			rnodealloc.Max.Y,
+		)
+		temp := s.rmana.New(s.rnode, nil)
+		temp.SetAllocation(inrect)
+		v.GUMIRenderSetup(s.rmana, temp)
+		startat += dis[i]
+
+	}
 }
 
 // GUMIEventer / GUMIHappen					-> Define
@@ -121,7 +124,6 @@ func (s *LHorizontal) GUMIHappen(event Event) {
 func (s *LHorizontal) String() string {
 	return fmt.Sprintf("%s(childrun:%d)", "LHorizontal", len(s.Childrun()))
 }
-
 
 // Constructor 0
 func LHorizontal0(rule gcore.Distribute, childrun ...GUMI) *LHorizontal {
@@ -156,5 +158,3 @@ func (s *LHorizontal) SizeElements() int {
 func (s *LHorizontal) SaveElements(mode gcore.Mode, index gcore.Index, elem ...GUMI) (input int) {
 	return saveGUMIChildrun(&s.child, mode, index, elem...)
 }
-
-

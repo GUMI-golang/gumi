@@ -1,10 +1,10 @@
-package temp
+package gumi
 
 import (
 	"fmt"
 	"image"
-	"github.com/iamGreedy/gumi/gumre"
-	"github.com/iamGreedy/gumi/drawer"
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
 )
 
 // MTRadio Default Values
@@ -12,12 +12,12 @@ const (
 	mtRadioMinWidth                  = 20
 	mtRadioMinHeight                 = 20
 	mtRadioAnimationOnOffDeltaMillis = 200
-	mtRadioInnerRadiusDifference = 3
+	mtRadioInnerRadiusDifference     = 3
 )
 
 // MTRadio Animations
 const (
-	mtRadioAnimationOnOff  = iota
+	mtRadioAnimationOnOff = iota
 	//
 	mtRadioAnimationLength = iota
 )
@@ -28,16 +28,36 @@ const (
 type MTRadio struct {
 	//
 	VoidNode
-	boundStore
 	styleStore
 	rendererStore
 	//
 	mtColorFromTo
 	studio *gcore.Studio
-	onoff *gcore.Percenting
+	onoff  *gcore.Percenting
 	//
 	cursorEnter, active bool
 	onActive            MTRadioActive
+}
+
+func (s *MTRadio) BaseRender(subimg *image.RGBA) {
+	var ctx = createContext(subimg)
+	var w, h = float64(ctx.Width()), float64(ctx.Height())
+	var baseColor0 = s.GetFromMaterialColor().BaseColor()
+	var mainColor1 = s.GetToMaterialColor().MainColor()
+	var radius = h / 2
+	var innerRadius = radius - mtRadioInnerRadiusDifference
+	//
+	ctx.SetColor(baseColor0)
+	ctx.DrawCircle(w/2, h/2, radius)
+	ctx.Fill()
+	//
+	ctx.SetColor(Scale.Color(baseColor0, mainColor1, s.onoff.Value()))
+	ctx.DrawCircle(w/2, h/2, innerRadius)
+	ctx.Fill()
+}
+
+func (s *MTRadio) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
+	return image.ZR
 }
 
 // Material::Radio<Callback> -> Focus
@@ -61,7 +81,9 @@ func (s *MTRadio) GUMIInfomation(info Information) {
 	} else {
 		s.onoff.Request(0)
 	}
-	s.studio.Animate(float64(info.Dt))
+	if s.studio.Animate(float64(info.Dt)) {
+		s.rnode.ThrowCache()
+	}
 }
 
 // GUMIFunction / GUMIStyle 				-> Define
@@ -69,28 +91,7 @@ func (s *MTRadio) GUMIStyle(style *Style) {
 	s.style = style
 }
 
-// GUMIFunction / GUMIClip 					-> Define
-func (s *MTRadio) GUMIClip(r image.Rectangle) {
-	s.bound = r
-}
 
-// GUMIFunction / GUMIRender 				-> Define
-func (s *MTRadio) GUMIRender(frame *image.RGBA) {
-	var ctx = createContextRGBASub(frame, s.bound)
-	var w, h = float64(ctx.Width()), float64(ctx.Height())
-	var baseColor0 = s.GetFromMaterialColor().BaseColor()
-	var mainColor1 = s.GetToMaterialColor().MainColor()
-	var radius = h / 2
-	var innerRadius = radius - mtRadioInnerRadiusDifference
-	//
-	ctx.SetColor(baseColor0)
-	ctx.DrawCircle(w/2, h/2, radius)
-	ctx.Fill()
-	//
-	ctx.SetColor(Scale.Color(baseColor0, mainColor1, s.onoff.Value()))
-	ctx.DrawCircle(w/2, h/2, innerRadius)
-	ctx.Fill()
-}
 
 // GUMIFunction / GUMISize 					-> Define
 func (s *MTRadio) GUMISize() gcore.Size {
@@ -109,18 +110,10 @@ func (s *MTRadio) GUMISize() gcore.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define
-func (s *MTRadio) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
-	s.frame = frame
-}
-
-// GUMIRenderer / GUMIUpdate 				-> Define
-func (s *MTRadio) GUMIUpdate() {
-	panic("implement me")
-}
-
-// GUMIRenderer / GUMIDraw 					-> Define
-func (s *MTRadio) GUMIDraw() {
-	s.GUMIRender(frame)
+func (s *MTRadio) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
+	s.rmana = man
+	s.rnode = man.New(parent, nil)
+	s.rnode.SetJob(s)
 }
 
 // GUMIEventer / GUMIHappen					-> Define
@@ -139,7 +132,8 @@ func (s *MTRadio) GUMIHappen(event Event) {
 	case EventCursor:
 		x := int(ev.X)
 		y := int(ev.Y)
-		if (s.bound.Min.X <= x && x < s.bound.Max.X) && (s.bound.Min.Y <= y && y < s.bound.Max.Y) {
+		bd := s.rnode.GetAllocation()
+		if (bd.Min.X <= x && x < bd.Max.X) && (bd.Min.Y <= y && y < bd.Max.Y) {
 			s.cursorEnter = true
 		} else {
 			s.cursorEnter = false

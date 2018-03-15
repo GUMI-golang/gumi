@@ -1,7 +1,5 @@
 package gcore
 
-
-
 type Reaching struct {
 	off                       bool
 	Current, Delta, To, Range float64

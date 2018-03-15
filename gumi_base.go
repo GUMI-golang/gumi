@@ -9,6 +9,7 @@ import (
 type VoidNode struct {
 	parent GUMI
 }
+
 func (s *VoidNode) GUMIInit() {
 }
 func (s *VoidNode) born(gumi GUMI) {
@@ -27,6 +28,7 @@ type SingleNode struct {
 	parent GUMI
 	child  GUMI
 }
+
 func (s *SingleNode) GUMIInit() {
 	s.child.GUMIInit()
 }
@@ -51,7 +53,7 @@ type MultipleNode struct {
 }
 
 func (s *MultipleNode) GUMIInit() {
-	for _ , v := range s.child{
+	for _, v := range s.child {
 		v.GUMIInit()
 	}
 }
@@ -71,8 +73,6 @@ func (s *MultipleNode) Childrun() []GUMI {
 	}
 	return res
 }
-
-
 
 type styleStore struct {
 	style *Style

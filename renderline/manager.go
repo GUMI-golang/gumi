@@ -24,7 +24,7 @@ type Manager struct {
 // Node의 Setup과정에 도움을 주는 메서드
 // 편의성 이외의 의미는 없음
 func (s *Manager) New(parent, Value Node) Node {
-	if Value == nil{
+	if Value == nil {
 		Value = NewSimpleNode()
 	}
 	Value.setManager(s)

@@ -32,8 +32,8 @@ func (s *NDrawing) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
 
 func (s *NDrawing) GUMIInfomation(info Information) {
 	var changed bool
-	for _, v := range s.drawfuncs{
-		if v2, ok := v.(DrawerWithInformation); ok{
+	for _, v := range s.drawfuncs {
+		if v2, ok := v.(DrawerWithInformation); ok {
 			changed = changed || v2.Inform(info)
 		}
 	}
@@ -60,6 +60,7 @@ func (s *NDrawing) GUMISize() gcore.Size {
 func (s *NDrawing) String() string {
 	return fmt.Sprintf("%s(drawing:%d GUMIRender)", "NDrawing", len(s.drawfuncs))
 }
+
 //
 func NDrawing0(drawFuncs ...Drawer) *NDrawing {
 	return &NDrawing{

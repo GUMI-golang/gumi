@@ -1,7 +1,5 @@
 package gcore
 
-
-
 type Percenting struct {
 	From, Current, Delta, To float64
 	Fn                       AnimationFunction

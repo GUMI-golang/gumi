@@ -1,11 +1,11 @@
-package temp
+package gumi
 
 import (
 	"fmt"
-	"image"
-	"github.com/iamGreedy/gumi/gumre"
-	"github.com/iamGreedy/gumi/drawer"
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
 )
+
 type NMinimum struct {
 	SingleNode
 	axis gcore.Axis
@@ -17,30 +17,19 @@ func (s *NMinimum) GUMIInfomation(info Information) {
 func (s *NMinimum) GUMIStyle(style *Style) {
 	s.child.GUMIStyle(style)
 }
-func (s *NMinimum) GUMIClip(r image.Rectangle) {
-	s.child.GUMIClip(r)
-}
-func (s *NMinimum) GUMIRender(frame *image.RGBA) {
-}
 func (s *NMinimum) GUMISize() gcore.Size {
 	sz := s.child.GUMISize()
-	if gcore.AxisVertical == gcore.AxisVertical & s.axis{
+	if gcore.AxisVertical == gcore.AxisVertical&s.axis {
 		sz.Vertical.Max = sz.Vertical.Min
 	}
-	if gcore.AxisHorizontal == gcore.AxisHorizontal & s.axis{
+	if gcore.AxisHorizontal == gcore.AxisHorizontal&s.axis {
 		sz.Horizontal.Max = sz.Horizontal.Min
 	}
 	return sz
 }
 
-
-func (s *NMinimum) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
-}
-func (s *NMinimum) GUMIDraw() {
-	s.child.GUMIDraw()
-}
-func (s *NMinimum) GUMIUpdate() {
-	panic("implement me")
+func (s *NMinimum) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
+	s.child.GUMIRenderSetup(man, parent)
 }
 
 func (s *NMinimum) GUMIHappen(event Event) {
@@ -53,7 +42,7 @@ func (s *NMinimum) String() string {
 
 func NMinimum0(axis gcore.Axis, elem GUMI) *NMinimum {
 	temp := &NMinimum{
-		axis:axis,
+		axis: axis,
 	}
 	elem.born(temp)
 	temp.breed([]GUMI{elem})

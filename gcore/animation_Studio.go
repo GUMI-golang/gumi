@@ -4,7 +4,7 @@ type Studio struct {
 	ani []Actor
 }
 
-func (_Animation) Studio(anicount int)  *Studio {
+func (_Animation) Studio(anicount int) *Studio {
 	temp := &Studio{
 		ani: make([]Actor, anicount),
 	}

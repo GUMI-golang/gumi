@@ -48,7 +48,7 @@ func (s *AText) BaseRender(subimg *image.RGBA) {
 	case gcore.AlignLeft:
 		drawX = 0
 	}
-	ctx.DrawString(s.text, drawX, drawY - 1)
+	ctx.DrawString(s.text, drawX, drawY-1)
 }
 
 // renderline.Job / DecalRender
@@ -95,7 +95,6 @@ func (s *AText) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node)
 	s.rnode.SetJob(s)
 }
 
-
 // GUMIEventer / GUMIHappen					-> Define
 func (s *AText) GUMIHappen(event Event) {
 }
@@ -118,9 +117,9 @@ func AText0(str string) *AText {
 // Constructor 1
 func AText1(str string, align gcore.Align) *AText {
 	temp := &AText{
-		text:str,
-		align:align,
-		textColor:color.White,
+		text:      str,
+		align:     align,
+		textColor: color.White,
 	}
 	return temp
 }
@@ -128,9 +127,9 @@ func AText1(str string, align gcore.Align) *AText {
 // Constructor 2
 func AText2(str string, align gcore.Align, textColor color.Color) *AText {
 	temp := &AText{
-		text:str,
-		align:align,
-		textColor:textColor,
+		text:      str,
+		align:     align,
+		textColor: textColor,
 	}
 	return temp
 }
@@ -147,7 +146,7 @@ func (s *AText) Get() string {
 
 // Method / SetText
 func (s *AText) SetText(text string) {
-	if s.text != text{
+	if s.text != text {
 		s.text = text
 		s.rnode.ThrowCache()
 	}
@@ -160,7 +159,7 @@ func (s *AText) GetText() string {
 
 // Method / SetAlign
 func (s *AText) SetAlign(align gcore.Align) {
-	if s.align != align{
+	if s.align != align {
 		s.align = align
 		s.rnode.ThrowCache()
 	}
@@ -173,9 +172,9 @@ func (s *AText) GetAlign() gcore.Align {
 
 // Method / SetColor
 func (s *AText) SetColor(textColor color.Color) {
-	r1,g1,b1,a1 := s.textColor.RGBA()
-	r2,g2,b2,a2 := textColor.RGBA()
-	if r1 != r2 || g1 != g2 || b1 != b2 || a1 != a2{
+	r1, g1, b1, a1 := s.textColor.RGBA()
+	r2, g2, b2, a2 := textColor.RGBA()
+	if r1 != r2 || g1 != g2 || b1 != b2 || a1 != a2 {
 		s.textColor = textColor
 		s.rnode.ThrowCache()
 	}

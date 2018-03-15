@@ -20,6 +20,7 @@ func (s Index) Indexize(length int) int {
 	}
 	return IndexNotExist
 }
+
 const (
 	IndexNotExist = -1
 )

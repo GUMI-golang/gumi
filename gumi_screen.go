@@ -1,17 +1,16 @@
 package gumi
 
 import (
+	"github.com/GUMI-golang/gumi/renderline"
 	"image"
 	"math/rand"
-	"github.com/GUMI-golang/gumi/renderline"
 )
 
 type Screen struct {
 	RenderingPipeline *renderline.Manager
 	rstyle            *Style
 	//
-	_hook  map[uint64]func(event Event) Event
-	_defer map[uint64]func(rgba *image.RGBA)
+	_hook map[uint64]func(event Event) Event
 	//
 
 	//
@@ -23,7 +22,6 @@ func NewScreen(w, h int) *Screen {
 		RenderingPipeline: renderline.NewManager(w, h),
 		rstyle:            DefaultStyle(),
 		_hook:             make(map[uint64]func(event Event) Event),
-		_defer:            make(map[uint64]func(rgba *image.RGBA)),
 	}
 	return res
 }
@@ -40,6 +38,7 @@ func (s *Screen) Size() (width, height int) {
 func (s *Screen) Root(root GUMI) {
 	s.root = newGUMIRoot(s, root)
 }
+
 //
 func (s *Screen) Event(event Event) {
 	for _, v := range s._hook {
@@ -52,6 +51,7 @@ func (s *Screen) Event(event Event) {
 	}
 	s.root.GUMIHappen(event)
 }
+
 //
 func (s *Screen) Init() {
 	s.root.GUMIInit()
@@ -67,6 +67,7 @@ func (s *Screen) Update(info Information) {
 func (s *Screen) Draw() {
 	s.RenderingPipeline.Render()
 }
+
 //
 func (s *Screen) Frame() image.Image {
 	return s.RenderingPipeline.Image()
@@ -92,21 +93,4 @@ func (s *Screen) hookReserve() (id uint64) {
 }
 func (s *Screen) hookRequest(id uint64, hooking func(event Event) Event) {
 	s._hook[id] = hooking
-}
-func (s *Screen) deferReserve() (id uint64) {
-	defer func() {
-		s._defer[id] = nil
-	}()
-	for {
-		id = rand.Uint64()
-		if id == 0 {
-			continue
-		}
-		if _, ok := s._defer[id]; !ok {
-			return
-		}
-	}
-}
-func (s *Screen) deferRequest(id uint64, d func(rgba *image.RGBA)) {
-	s._defer[id] = d
 }

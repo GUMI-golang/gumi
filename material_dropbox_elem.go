@@ -1,10 +1,11 @@
-package temp
+package gumi
 
 type mtDropboxElemList []*mtDropboxElem
 type mtDropboxElem struct {
 	content string
 	w, h    int
 }
+
 func newMTDropboxElem(content string) *mtDropboxElem {
 	return &mtDropboxElem{
 		content: content,
@@ -34,6 +35,7 @@ func (s *mtDropboxElemList) Exist(idx int) bool {
 func (s *mtDropboxElemList) Length() int {
 	return len(*s)
 }
+
 //
 func (s *mtDropboxElemList) update(sty *Style) {
 	sty.Default.Font.Use()

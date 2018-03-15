@@ -10,7 +10,7 @@ func GCD(a, b int64) int64 {
 }
 
 func Sum(dts []float64) (res float64) {
-	for _, v := range dts{
+	for _, v := range dts {
 		res += v
 	}
 	return res

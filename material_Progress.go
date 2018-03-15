@@ -1,16 +1,16 @@
-package temp
+package gumi
 
 import (
 	"fmt"
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/gumi/renderline"
 	"github.com/fogleman/gg"
 	"image"
-	"github.com/iamGreedy/gumi/gumre"
-	"github.com/iamGreedy/gumi/drawer"
 )
 
 // MTProgress Default Values
 const (
-	mtProgressMin                        = 8
+	mtProgressMin                             = 8
 	mtProgressAnimationProgressPixelPerSecond = 512
 )
 
@@ -24,65 +24,30 @@ const (
 // Material::Progress
 //
 // Material theme progress bar
-type MTProgress struct {
-	VoidNode
-	boundStore
-	styleStore
-	rendererStore
-	//
-	mtColorFromTo
-	studio   *gcore.Studio
-	progress *gcore.Percenting
-	//
-	axis gcore.Axis
-	//
-	onChange MTProgressChange
-	//
-	cursorEnter, active bool
-}
-
-// Material::Progress<Callback> -> Change
-//
-// If percentage changed, it happen
-type MTProgressChange func(self *MTProgress, percent float64)
-
-// GUMIFunction / GUMIInit 					-> Define
-func (s *MTProgress) GUMIInit() {
-	s.studio = gcore.Animation.Studio(mtProgressAnimationLength)
-	s.progress = s.studio.Set(mtProgressAnimationProgress, &gcore.Percenting{
-		Fn: Material.DefaultAnimation.Progress,
-	}).(*gcore.Percenting)
-
-}
-
-// GUMIFunction / GUMIInfomation 			-> Define
-func (s *MTProgress) GUMIInfomation(info Information) {
-	s.studio.Animate(float64(info.Dt))
-}
-
-// GUMIFunction / GUMIStyle 				-> Define
-func (s *MTProgress) GUMIStyle(style *Style) {
-	s.style = style
-}
-
-// GUMIFunction / GUMIClip 					-> Define
-func (s *MTProgress) GUMIClip(r image.Rectangle) {
-	s.bound = r
-	switch s.axis {
-	default:
-		fallthrough
-	case gcore.AxisHorizontal:
-		s.progress.Delta = gcore.Animation.ReachingBySpeed(float64(s.bound.Dx()), mtProgressAnimationProgressPixelPerSecond)
-	case gcore.AxisVertical:
-		s.progress.Delta = gcore.Animation.ReachingBySpeed(float64(s.bound.Dy()), mtProgressAnimationProgressPixelPerSecond)
+type (
+	MTProgress struct {
+		VoidNode
+		rendererStore
+		styleStore
+		//
+		mtColorFromTo
+		studio   *gcore.Studio
+		progress *gcore.Percenting
+		//
+		axis gcore.Axis
+		//
+		onChange MTProgressChange
+		//
+		cursorEnter, active bool
 	}
-}
+	// If percentage changed, it happen
+	MTProgressChange func(self *MTProgress, percent float64)
+)
 
-// GUMIFunction / GUMIRender 				-> Define
-func (s *MTProgress) GUMIRender(frame *image.RGBA) {
+func (s *MTProgress) BaseRender(subimg *image.RGBA) {
 	var baseColor0, mainColor0 = s.GetFromMaterialColor().Color()
 	var baseColor1, mainColor1 = s.GetToMaterialColor().Color()
-	var ctx = createContextRGBASub(frame, s.bound)
+	var ctx = createContext(subimg)
 	var w, h = float64(ctx.Width()), float64(ctx.Height())
 	var percentpr = s.progress.Value()
 
@@ -118,11 +83,36 @@ func (s *MTProgress) GUMIRender(frame *image.RGBA) {
 		// progress bar
 		percentLength := Scale.Length(h-radius*2, percentpr)
 		ctx.SetColor(Scale.Color(mainColor0, mainColor1, percentpr))
-		ctx.DrawArc(radius, h - radius - percentLength, radius, gg.Radians(180), gg.Radians(360))
-		ctx.DrawRectangle(0, h - radius - percentLength, w, percentLength)
-		ctx.DrawArc(radius, h - radius, radius, gg.Radians(0), gg.Radians(180))
+		ctx.DrawArc(radius, h-radius-percentLength, radius, gg.Radians(180), gg.Radians(360))
+		ctx.DrawRectangle(0, h-radius-percentLength, w, percentLength)
+		ctx.DrawArc(radius, h-radius, radius, gg.Radians(0), gg.Radians(180))
 		ctx.Fill()
 	}
+}
+
+func (s *MTProgress) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
+	return image.ZR
+}
+
+// GUMIFunction / GUMIInit 					-> Define
+func (s *MTProgress) GUMIInit() {
+	s.studio = gcore.Animation.Studio(mtProgressAnimationLength)
+	s.progress = s.studio.Set(mtProgressAnimationProgress, &gcore.Percenting{
+		Fn: Material.DefaultAnimation.Progress,
+	}).(*gcore.Percenting)
+
+}
+
+// GUMIFunction / GUMIInfomation 			-> Define
+func (s *MTProgress) GUMIInfomation(info Information) {
+	if s.studio.Animate(float64(info.Dt)) {
+		s.rnode.ThrowCache()
+	}
+}
+
+// GUMIFunction / GUMIStyle 				-> Define
+func (s *MTProgress) GUMIStyle(style *Style) {
+	s.style = style
 }
 
 // GUMIFunction / GUMISize 					-> Define
@@ -142,18 +132,18 @@ func (s *MTProgress) GUMISize() gcore.Size {
 // GUMITree / childrun()					-> VoidNode::Default
 
 // GUMIRenderer / GUMIRenderSetup 			-> Define
-func (s *MTProgress) GUMIRenderSetup(frame *image.RGBA, tree *media.RenderTree, parentnode *media.RenderNode) {
-	s.frame = frame
-}
-
-// GUMIRenderer / GUMIUpdate 				-> Define
-func (s *MTProgress) GUMIUpdate() {
-	panic("implement me")
-}
-
-// GUMIRenderer / GUMIDraw 				-> Define
-func (s *MTProgress) GUMIDraw() {
-	s.GUMIRender(s.frame)
+func (s *MTProgress) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
+	switch s.axis {
+	default:
+		fallthrough
+	case gcore.AxisHorizontal:
+		s.progress.Delta = gcore.Animation.ReachingBySpeed(float64(parent.GetAllocation().Dx()), mtProgressAnimationProgressPixelPerSecond)
+	case gcore.AxisVertical:
+		s.progress.Delta = gcore.Animation.ReachingBySpeed(float64(parent.GetAllocation().Dy()), mtProgressAnimationProgressPixelPerSecond)
+	}
+	s.rmana = man
+	s.rnode = man.New(parent, nil)
+	s.rnode.SetJob(s)
 }
 
 // GUMIEventer / GUMIHappen					-> Define
@@ -189,13 +179,12 @@ func MTProgress1(from, to *MaterialColor) *MTProgress {
 // Constructor 2
 func MTProgress2(from, to *MaterialColor, axis gcore.Axis) *MTProgress {
 	temp := &MTProgress{
-		axis:axis,
+		axis: axis,
 	}
 	temp.SetFromMaterialColor(from)
 	temp.SetToMaterialColor(to)
 	return temp
 }
-
 
 // Method / Get -> GetPercent
 func (s *MTProgress) Get() float64 {

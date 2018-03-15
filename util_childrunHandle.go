@@ -19,12 +19,12 @@ func saveGUMIChildrun(dst *[]GUMI, mode gcore.Mode, index gcore.Index, src ...GU
 		}
 	case gcore.PUSHBACKWARD:
 		idx = (index + gcore.Index(1)).Indexize(ln)
-		if idx == gcore.IndexNotExist{
+		if idx == gcore.IndexNotExist {
 			(*dst) = append(
 				(*dst),
 				src...,
 			)
-		}else {
+		} else {
 			dstforw := (*dst)[:idx]
 			dstback := (*dst)[idx:]
 			(*dst) = append(
@@ -50,21 +50,21 @@ func saveGUMIChildrun(dst *[]GUMI, mode gcore.Mode, index gcore.Index, src ...GU
 	}
 	return writen
 }
-func loadGUMIChildrun (dst []GUMI, index gcore.Index, count int) (res []GUMI) {
+func loadGUMIChildrun(dst []GUMI, index gcore.Index, count int) (res []GUMI) {
 	var ln = len(dst)
 	var idx = index.Indexize(ln)
 	var sz int
-	if idx == gcore.IndexNotExist{
+	if idx == gcore.IndexNotExist {
 		return
 	}
-	if idx + count <= ln{
+	if idx+count <= ln {
 		sz = count
-	}else {
+	} else {
 		sz = ln - idx
 	}
 	res = make([]GUMI, sz)
-	for i := 0; i < sz; i ++ {
-		res[i] = dst[idx + i]
+	for i := 0; i < sz; i++ {
+		res[i] = dst[idx+i]
 	}
 	return res
 }
