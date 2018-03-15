@@ -65,6 +65,7 @@ type (
 func (s *MTDropbox) BaseRender(subimg *image.RGBA) {
 	var baseColor, mainColor = s.GetMaterialColor().Color()
 	var bd = s.rnode.GetAllocation()
+
 	s.boxCut = 0
 	s.boxHeight = mtDropboxElemMargin*(s.Elems.Length()+1) + s.Elems.heightSum()
 	if s.boxMaximum < s.boxHeight {
@@ -74,31 +75,27 @@ func (s *MTDropbox) BaseRender(subimg *image.RGBA) {
 	if bd.Max.Y+s.boxHeight > s.rmana.Height() {
 		s.boxCut += (s.rnode.GetAllocation().Max.Y + s.boxHeight) - s.rmana.Height()
 	}
-	var val = s.stretch.Value()
-	//var per = s.stretch.Percent()
-	if !(val > 0 && s.Elems.Length() > 0) {
-		var ctx = createContext(subimg)
-		s.style.useContext(ctx)
-		defer s.style.releaseContext(ctx)
-		//
-		var w, h = float64(ctx.Width()), float64(ctx.Height())
-		var radius = float64(bd.Dy()) / 2
-		//
-		ctx.SetColor(baseColor)
-		ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
-		ctx.DrawRectangle(radius, 0, w-radius*2, h)
-		ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(90))
-		ctx.Fill()
-		//
-		ctx.SetColor(mainColor)
-		elem := s.Elems.getForDraw(s.selected)
-		if len(elem.content) > 0 {
-			ctx.DrawString(elem.content, radius, (h-float64(elem.h))/2+float64(elem.h))
-			ctx.Stroke()
-		}
-		ctx.DrawCircle(w-radius, radius, mtDropboxScroolWidth/2)
-		ctx.Fill()
+	var ctx = createContext(subimg)
+	s.style.useContext(ctx)
+	defer s.style.releaseContext(ctx)
+	//
+	var w, h = float64(ctx.Width()), float64(ctx.Height())
+	var radius = float64(bd.Dy()) / 2
+	//
+	ctx.SetColor(baseColor)
+	ctx.DrawArc(radius, radius, radius, gg.Radians(90), gg.Radians(270))
+	ctx.DrawRectangle(radius, 0, w-radius*2, h)
+	ctx.DrawArc(w-radius, radius, radius, gg.Radians(-90), gg.Radians(90))
+	ctx.Fill()
+	//
+	ctx.SetColor(mainColor)
+	elem := s.Elems.getForDraw(s.selected)
+	if len(elem.content) > 0 {
+		ctx.DrawString(elem.content, radius, (h-float64(elem.h))/2+float64(elem.h))
+		ctx.Stroke()
 	}
+	ctx.DrawCircle(w-radius, radius, mtDropboxScroolWidth/2)
+	ctx.Fill()
 }
 
 func (s *MTDropbox) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
@@ -151,7 +148,7 @@ func (s *MTDropbox) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
 			// selected
 			selectedElem := s.Elems.getForDraw(s.selected)
 			if len(selectedElem.content) > 0 {
-				ctx.DrawString(selectedElem.content, radius, (float64(bd.Dy())-float64(selectedElem.h))/2+float64(selectedElem.h))
+				ctx.DrawString(selectedElem.content, radius, (float64(alloc.Dy())-float64(selectedElem.h))/2+float64(selectedElem.h))
 				ctx.Stroke()
 			}
 			// scroll
@@ -192,6 +189,10 @@ func (s *MTDropbox) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
 				sum += v.h + mtDropboxElemMargin
 			}
 		}()
+		//
+		bd := alloc
+		bd.Max.Y += int(val)
+		return bd
 	}
 	return image.ZR
 }
@@ -283,6 +284,7 @@ func (s *MTDropbox) GUMIHappen(event Event) {
 					// 선택상태, 커서 진입인 경우 selected, 선택하기
 					if s.hover >= 0 {
 						s.selected = s.hover
+						s.rnode.ThrowCache()
 
 					}
 					s.active = false
