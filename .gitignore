@@ -14,7 +14,8 @@
 .glide/
 
 # idea cache
-.idea/
+.idea
+
 
 # asset, generated
 assets.go
