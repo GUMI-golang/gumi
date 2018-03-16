@@ -9,3 +9,4 @@ func Clamp(i float64, min, max float64) float64 {
 	}
 	return i
 }
+

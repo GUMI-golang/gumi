@@ -20,7 +20,9 @@ func (s _MaterialAnimation) Progress(t float64) float64 {
 func (s _MaterialAnimation) Edit(t float64) float64 {
 	return gcore.Animation.Functions.Quart.EasingOut(t)
 }
-
+func (s _MaterialAnimation) ColorExtend(t float64) float64 {
+	return gcore.Animation.Functions.Quad.Easing(t)
+}
 
 func (s _MaterialAnimation) Radio(t float64) float64 {
 	return gcore.Animation.Functions.Default(t)

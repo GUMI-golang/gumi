@@ -31,16 +31,19 @@ type _Drawing struct {
 
 const FPSPos = 10
 
-func (_Drawing) FPS() Drawer {
-	return &fpsDrawer{}
+func (_Drawing) FPS(prefix string) Drawer {
+	return &fpsDrawer{
+		prefix: prefix,
+	}
 }
 
 const fpsDrawerHistory = 32
 
 type fpsDrawer struct {
-	dts [fpsDrawerHistory]float64
-	i   int
-	c   int
+	prefix string
+	dts    [fpsDrawerHistory]float64
+	i      int
+	c      int
 }
 
 func (s *fpsDrawer) Draw(context *gg.Context, style *Style) image.Rectangle {
@@ -49,7 +52,7 @@ func (s *fpsDrawer) Draw(context *gg.Context, style *Style) image.Rectangle {
 	//
 	context.SetColor(rulerColor)
 	var avg = Clamp(gcore.Average(s.dts[:s.c]), 0.001, math.MaxFloat64)
-	txt := fmt.Sprintf("FPS : %.2f - AVG : %2.5f", 1000/float64(avg), avg)
+	txt := fmt.Sprintf("%s %.2f - %2.5f", s.prefix, 1000/float64(avg), avg)
 	w := float64(context.Width())
 	mw, mh := context.MeasureString(txt)
 	context.DrawString(txt, w-FPSPos-mw, FPSPos+mh)
