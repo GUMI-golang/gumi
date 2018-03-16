@@ -3,7 +3,7 @@ package gumi
 import (
 	"fmt"
 	"github.com/GUMI-golang/gumi/gcore"
-	"github.com/GUMI-golang/gumi/renderline"
+	"github.com/GUMI-golang/gumi/pipelines/renderline"
 	"github.com/fogleman/gg"
 	"image"
 )
@@ -38,12 +38,12 @@ type (
 		textCursor *gcore.Switching
 		delPercent *mtEditDeleteActor
 		//
-		ctrl        bool
+		ctrl bool
 		//
-		align    gcore.Align
-		text     string
+		align       gcore.Align
+		text        string
 		editingRune rune
-		inactive bool
+		inactive    bool
 		//
 		onChange            MTEditChange
 		cursorEnter, active bool
@@ -187,15 +187,15 @@ func (s *MTEdit) GUMIHappen(event Event) {
 	case EventKeyPress:
 		switch ev.Key {
 		case KEY_CONTROL:
-			if !s.active{
+			if !s.active {
 				return
 			}
 			s.ctrl = true
 		case KEY_BACKSPACE:
-			if !s.active{
+			if !s.active {
 				return
 			}
-			if s.editingRune != 0{
+			if s.editingRune != 0 {
 				return
 			}
 			s.delPercent.Start()
@@ -203,12 +203,12 @@ func (s *MTEdit) GUMIHappen(event Event) {
 	case EventKeyRelease:
 		switch ev.Key {
 		case KEY_CONTROL:
-			if !s.active{
+			if !s.active {
 				return
 			}
 			s.ctrl = false
 		case KEY_BACKSPACE:
-			if !s.active{
+			if !s.active {
 				return
 			}
 			s.delPercent.Reset()
@@ -234,14 +234,14 @@ func (s *MTEdit) GUMIHappen(event Event) {
 
 		}
 	case EventRuneEdit:
-		if !s.active{
+		if !s.active {
 			return
 		}
 		s.editingRune = ev.Rune
 		s.rnode.ThrowCache()
 		s.emitChange()
 	case EventRuneComplete:
-		if !s.active{
+		if !s.active {
 			return
 		}
 		s.editingRune = 0
@@ -350,10 +350,10 @@ func (s *MTEdit) ReferChange() MTEditChange {
 }
 
 func (s *MTEdit) emitChange() {
-	if s.onChange != nil{
-		if s.editingRune != 0{
-			s.onChange(s, s.text + string(s.editingRune))
-		}else {
+	if s.onChange != nil {
+		if s.editingRune != 0 {
+			s.onChange(s, s.text+string(s.editingRune))
+		} else {
 			s.onChange(s, s.text)
 		}
 	}

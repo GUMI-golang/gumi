@@ -1,7 +1,7 @@
 package gumi
 
 import (
-	"github.com/GUMI-golang/gumi/renderline"
+	"github.com/GUMI-golang/gumi/pipelines/renderline"
 	"image"
 	"math/rand"
 )

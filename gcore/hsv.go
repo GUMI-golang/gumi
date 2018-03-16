@@ -1,9 +1,10 @@
 package gcore
 
 import (
-	"math"
 	"image/color"
+	"math"
 )
+
 func Clamp(i float64, min, max float64) float64 {
 	if i < min {
 		return min
@@ -18,12 +19,12 @@ func Clamp(i float64, min, max float64) float64 {
 func HSVToRGB(h, s, v float64) color.RGBA {
 	var i, f, p, q, t float64
 	if s == 0 {
-		outV := uint8(Clamp(v * 255 + 0.5, 0, 255))
+		outV := uint8(Clamp(v*255+0.5, 0, 255))
 		return color.RGBA{outV, outV, outV, 0xFF}
 	}
 
 	i = math.Floor(h * 6)
-	f = h * 6 - i
+	f = h*6 - i
 	p = v * (1 - s)
 	q = v * (1 - s*f)
 	t = v * (1 - s*(1-f))
@@ -61,4 +62,3 @@ func HSVToRGB(h, s, v float64) color.RGBA {
 	outB := uint8(Clamp(b*255+0.5, 0, 255))
 	return color.RGBA{outR, outG, outB, 0xFF}
 }
-

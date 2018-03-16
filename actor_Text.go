@@ -6,7 +6,7 @@ import (
 	"image/color"
 
 	"github.com/GUMI-golang/gumi/gcore"
-	"github.com/GUMI-golang/gumi/renderline"
+	"github.com/GUMI-golang/gumi/pipelines/renderline"
 )
 
 // Actor::Text

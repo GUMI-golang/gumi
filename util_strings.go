@@ -1,10 +1,10 @@
 package gumi
 
 import (
+	"encoding/hex"
 	"fmt"
 	"image/color"
 	"strings"
-	"encoding/hex"
 )
 
 func StringBackSpace(str string, count int) string {
@@ -42,7 +42,6 @@ func StringControlBackSpace(str string, count int) (res string) {
 	return string(temp[:to])
 }
 
-
 func HexToColor(h string) color.Color {
 	if !strings.HasPrefix(h, "#") {
 		return color.Transparent
@@ -53,7 +52,7 @@ func HexToColor(h string) color.Color {
 		h = fmt.Sprintf("%c%c%c%c%c%c%c%c", h[0], h[0], h[1], h[1], h[2], h[2], h[3], h[3])
 	}
 	d, _ := hex.DecodeString(h)
-	if len(d) < 4{
+	if len(d) < 4 {
 		return color.Transparent
 	}
 	return color.RGBA{
@@ -63,10 +62,9 @@ func HexToColor(h string) color.Color {
 func HexFromColor(c color.Color) string {
 	r, g, b, a := c.RGBA()
 	return fmt.Sprintf("#%02x%02x%02x%02x",
-		uint8(r >> 8),
-		uint8(g >> 8),
-		uint8(b >> 8),
-		uint8(a >> 8),
+		uint8(r>>8),
+		uint8(g>>8),
+		uint8(b>>8),
+		uint8(a>>8),
 	)
 }
-

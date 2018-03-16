@@ -2,9 +2,9 @@ package gumi
 
 import (
 	"fmt"
-	"image"
 	"github.com/GUMI-golang/gumi/gcore"
-	"github.com/GUMI-golang/gumi/renderline"
+	"github.com/GUMI-golang/gumi/pipelines/renderline"
+	"image"
 )
 
 // MTRadio Default Values
@@ -90,8 +90,6 @@ func (s *MTRadio) GUMIInfomation(info Information) {
 func (s *MTRadio) GUMIStyle(style *Style) {
 	s.style = style
 }
-
-
 
 // GUMIFunction / GUMISize 					-> Define
 func (s *MTRadio) GUMISize() gcore.Size {

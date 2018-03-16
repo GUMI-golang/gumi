@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/GUMI-golang/gumi/gcore"
 	"github.com/GUMI-golang/gumi/media"
-	"github.com/GUMI-golang/gumi/renderline"
+	"github.com/GUMI-golang/gumi/pipelines/renderline"
 	"image"
 )
 
@@ -25,7 +25,7 @@ func (s *NCursor) BaseRender(subimg *image.RGBA) {
 }
 
 func (s *NCursor) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
-	if s.cursor == nil{
+	if s.cursor == nil {
 		return image.ZR
 	}
 	sz := s.cursor.Bound().Size()
@@ -35,7 +35,7 @@ func (s *NCursor) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
 	case gcore.AlignBottom:
 		y = y
 	case gcore.AlignVertical:
-		y = y - sz.Y / 2
+		y = y - sz.Y/2
 	case gcore.AlignTop:
 		y = y - sz.Y
 	}
@@ -43,11 +43,11 @@ func (s *NCursor) DecalRender(fullimg *image.RGBA) (updated image.Rectangle) {
 	case gcore.AlignRight:
 		x = x - sz.X
 	case gcore.AlignHorizontal:
-		x = x - sz.X / 2
+		x = x - sz.X/2
 	case gcore.AlignLeft:
 		x = 0
 	}
-	bd := image.Rect(x, y, x + sz.X, y + sz.Y).Add(s.rnode.GetAllocation().Min)
+	bd := image.Rect(x, y, x+sz.X, y+sz.Y).Add(s.rnode.GetAllocation().Min)
 	//
 	s.cursor.Draw(fullimg.SubImage(bd).(*image.RGBA))
 	return bd

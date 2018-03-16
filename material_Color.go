@@ -3,7 +3,7 @@ package gumi
 import (
 	"fmt"
 	"github.com/GUMI-golang/gumi/gcore"
-	"github.com/GUMI-golang/gumi/renderline"
+	"github.com/GUMI-golang/gumi/pipelines/renderline"
 	"image"
 	"image/color"
 )
@@ -180,7 +180,7 @@ func (s *MTColor) GUMIHappen(event Event) {
 			float64(ev.X)-float64(center.X),
 			float64(ev.Y)-float64(center.Y),
 		)
-		if deltaR < realR && !s.ignoreflag{
+		if deltaR < realR && !s.ignoreflag {
 			s.cursorEnter = true
 			//
 			s.hsv_H = gcore.ToZeroOne(deltaTheta)

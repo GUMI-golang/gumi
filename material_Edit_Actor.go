@@ -6,7 +6,7 @@ import (
 
 const (
 	newMTEditDeleteActor_PMILLIS = 4096
-	newMTEditDeleteActor_MAX = 8
+	newMTEditDeleteActor_MAX     = 8
 )
 
 type mtEditDeleteActor struct {
@@ -62,7 +62,7 @@ func (s *mtEditDeleteActor) Animate(delta float64) bool {
 		s.p.Animate(delta)
 		if s.sum-s.prev > s.Interval {
 			s.prev = s.sum
-			s.needDel += int32(s.p.Value()*newMTEditDeleteActor_MAX)
+			s.needDel += int32(s.p.Value() * newMTEditDeleteActor_MAX)
 			return true
 		}
 	}

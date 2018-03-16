@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/GUMI-golang/gumi/gcore"
 	"github.com/GUMI-golang/gumi/media"
-	"github.com/GUMI-golang/gumi/renderline"
+	"github.com/GUMI-golang/gumi/pipelines/renderline"
 	"image"
 )
 
