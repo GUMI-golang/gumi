@@ -60,10 +60,10 @@ func (s *SilluetNode) SetAllocation(alloc image.Rectangle) {
 	s.baseNode.SetAllocation(alloc)
 	s.silluetNode.SetAllocation(alloc)
 }
-func (s *SilluetNode) GetJob() Job {
+func (s *SilluetNode) GetJob() Worker {
 	return nil
 }
-func (s *SilluetNode) SetJob(j Job) {
+func (s *SilluetNode) SetJob(j Worker) {
 
 }
 
