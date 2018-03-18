@@ -15,8 +15,8 @@ type Node interface {
 	ThrowCache()
 	GetAllocation() image.Rectangle
 	SetAllocation(alloc image.Rectangle)
-	GetJob() Worker
-	SetJob(j Worker)
+	GetJob() Job
+	SetJob(j Job)
 	setManager(man *Manager)
 	valid() bool
 }

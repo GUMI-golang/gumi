@@ -14,7 +14,7 @@ type SimpleNode struct {
 	childrun []Node
 	// 정보 요소의 성분들, 렌더링 작업에서 무었을 해야 하는지를 정의한다.
 	allocation image.Rectangle
-	do         Worker
+	do         Job
 	cache      *image.RGBA
 	// 렌더링 작업의 결과를 저장하는 부분
 	// 렌더링 이후 이 노드가 활성화 되었었는지 등을 저장한다.
@@ -104,10 +104,10 @@ func (s *SimpleNode) GetAllocation() image.Rectangle {
 func (s *SimpleNode) SetAllocation(alloc image.Rectangle) {
 	s.allocation = alloc
 }
-func (s *SimpleNode) GetJob() Worker {
+func (s *SimpleNode) GetJob() Job {
 	return s.do
 }
-func (s *SimpleNode) SetJob(j Worker) {
+func (s *SimpleNode) SetJob(j Job) {
 	s.do = j
 }
 
