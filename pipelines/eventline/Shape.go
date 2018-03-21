@@ -2,49 +2,64 @@ package eventline
 
 import (
 	"image"
-	"golang.org/x/image/math/fixed"
 )
 
 type (
 	Shaper interface {
 		In(point image.Point) bool
-		AABB() image.Rectangle
 	}
 	RectShape struct {
-		bound fixed.Rectangle26_6
+		Bound image.Rectangle
 	}
 	CircleShape struct {
-		center fixed.Point26_6
-		radius fixed.Int26_6
+		Center     image.Point
+		Radius     int
+	}
+	ComplexShape struct {
+		shapers []Shaper
 	}
 )
 
-func (s *RectShape) In(point image.Point) bool {
-	pt := fixed.P(point.X, point.Y)
-	return (s.bound.Min.X < pt.X && pt.X < s.bound.Max.X) && (s.bound.Min.Y < pt.Y && pt.Y < s.bound.Max.Y)
+func NewComplexShape(shapers ... Shaper) *ComplexShape {
+	return &ComplexShape {
+		shapers:shapers,
+	}
+}
+func NewRectShape(rect image.Rectangle) *RectShape {
+	return &RectShape{
+		Bound: rect,
+	}
+}
+func NewCircleShape(center image.Point, radius int) *CircleShape {
+	return &CircleShape{
+		Center:     center,
+		Radius:radius,
+	}
+}
+func (s *ComplexShape) In(point image.Point) bool {
+	for _, v := range s.shapers{
+		if v.In(point){
+			return true
+		}
+	}
+	return false
+}
+func (s *ComplexShape) Clear() {
+	s.shapers = nil
+}
+func (s *ComplexShape) Append(shapers ... Shaper) {
+	s.shapers = append(s.shapers, shapers...)
 }
 
-func (s *RectShape) AABB() image.Rectangle {
-	return image.Rect(
-		s.bound.Min.X.Round(),
-		s.bound.Min.Y.Round(),
-		s.bound.Max.X.Round(),
-		s.bound.Max.Y.Round(),
-	)
+func (s *RectShape) In(point image.Point) bool {
+	return (s.Bound.Min.X < point.X && point.X < s.Bound.Max.X) && (s.Bound.Min.Y < point.Y && point.Y < s.Bound.Max.Y)
 }
 
 func (s *CircleShape) In(point image.Point) bool {
-	panic("implement me")
-}
-
-func (s *CircleShape) AABB() image.Rectangle {
-	r := s.radius.Round()
-	return image.Rect(
-		s.center.X.Round() - r,
-		s.center.Y.Round() - r,
-		s.center.X.Round() + r,
-		s.center.Y.Round() + r,
-	)
+	diff := point.Sub(s.Center)
+	diffRadQuad := diff.X * diff.X + diff.Y * diff.Y
+	radQuad := s.Radius * s.Radius
+	return diffRadQuad < radQuad
 }
 
 

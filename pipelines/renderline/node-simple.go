@@ -33,6 +33,8 @@ func (s *SimpleNode) Setup() {
 	//캐시 영역을 만들어 둠
 	if s.do != nil {
 		s.cache = image.NewRGBA(s.allocation)
+	}else {
+		s.cache = nil
 	}
 	s.cacheValid = false
 	for _, child := range s.childrun {

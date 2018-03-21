@@ -1,6 +1,7 @@
 package gumi
 
 import (
+	"github.com/GUMI-golang/gumi/pipelines/eventline"
 	"github.com/GUMI-golang/gumi/pipelines/renderline"
 	"image"
 	"math/rand"
@@ -8,6 +9,7 @@ import (
 
 type Screen struct {
 	RenderingPipeline *renderline.Manager
+	EventPipeline     *eventline.Manager
 	rstyle            *Style
 	//
 	_hook map[uint64]func(event Event) Event
@@ -59,7 +61,6 @@ func (s *Screen) Init() {
 
 	// renderline은 렌더 트리를 완성시킨 이후 셋업해야 함 따라서 GUMIRenderSetup 이후 Setup을 함
 	s.root.GUMIRenderSetup(s.RenderingPipeline, s.RenderingPipeline.New(nil, nil))
-	s.RenderingPipeline.Setup()
 }
 func (s *Screen) Update(info Information) {
 	s.root.GUMIInfomation(info)

@@ -1,5 +1,10 @@
 package gumi
 
+import (
+	"image"
+	"time"
+)
+
 const (
 	EVENT_KEYPRESS     EventKind = iota
 	EVENT_KEYRELEASE   EventKind = iota
@@ -7,58 +12,77 @@ const (
 	EVENT_SCROLL       EventKind = iota
 	EVENT_RUNECOMPLETE EventKind = iota
 	EVENT_RUNEEDIT     EventKind = iota
-	// RESIZE     EventKind = iota
+	EVENT_TICK         EventKind = iota
+	EVENT_RESIZE       EventKind = iota
+	EVENT_STYLE        EventKind = iota
 )
 
-type EventKind uint8
-type Event interface {
-	Kind() EventKind
-}
+type (
+	EventKind uint8
+	Event     interface {
+		Kind() EventKind
+	}
+)
 
-type EventCursor struct {
-	X, Y uint16
-}
+type (
+	EventCursor struct {
+		image.Point
+	}
+	EventScroll struct {
+		image.Point
+	}
+	EventKeyPress struct {
+		Key GUMIKey
+	}
+	EventKeyRelease struct {
+		Key GUMIKey
+	}
+	EventRuneComplete struct {
+		Rune rune
+	}
+	EventRuneEdit struct {
+		Rune rune
+	}
+	EventTick struct {
+		DeltaT time.Duration
+	}
+	EventResize struct {
+		Bound image.Rectangle
+	}
+	EventStyle struct {
+		Style *Style
+	}
+)
 
 func (EventCursor) Kind() EventKind {
 	return EVENT_CURSOR
 }
-
-type EventScroll struct {
-	X, Y int32
-}
-
 func (EventScroll) Kind() EventKind {
 	return EVENT_SCROLL
 }
-
-type EventKeyPress struct {
-	Key GUMIKey
-}
-
 func (EventKeyPress) Kind() EventKind {
 	return EVENT_KEYPRESS
 }
-
-type EventKeyRelease struct {
-	Key GUMIKey
-}
-
 func (EventKeyRelease) Kind() EventKind {
 	return EVENT_KEYRELEASE
 }
-
-type EventRuneComplete struct {
-	Rune rune
-}
-
 func (EventRuneComplete) Kind() EventKind {
 	return EVENT_RUNECOMPLETE
 }
-
-type EventRuneEdit struct {
-	Rune rune
-}
-
 func (EventRuneEdit) Kind() EventKind {
 	return EVENT_RUNEEDIT
+}
+func (EventTick) Kind() EventKind {
+	return EVENT_TICK
+}
+func (EventResize) Kind() EventKind {
+	return EVENT_RESIZE
+}
+func (EventStyle) Kind() EventKind {
+	return EVENT_STYLE
+}
+
+// Utils
+func (s EventCursor) ToPoint() image.Point {
+	return image.Pt(s.X, s.Y)
 }

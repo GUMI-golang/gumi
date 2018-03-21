@@ -39,12 +39,10 @@ func (s *Manager) New(parent, Value Node) Node {
 	return Value
 }
 
-// Setup은 이미지의 크기가 변경될 때마다 반드시 이뤄져야 함.
-// 이미지 리사이징이 이뤄진 경우 반드시 주의할 것
-func (s *Manager) Setup() {
-	s.Root.Setup()
-}
 func (s *Manager) Render() {
+	//
+	s.Root.Setup()
+	//
 	s.decalRect = image.ZR
 	wg := s.wgpool.Get().(*sync.WaitGroup)
 	defer s.wgpool.Put(wg)

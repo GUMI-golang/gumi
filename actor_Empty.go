@@ -42,15 +42,6 @@ func (AEmpty) GUMISize() gcore.Size {
 // GUMIRenderer / GUMIRenderSetup			-> Define::Empty
 func (s AEmpty) GUMIRenderSetup(man *renderline.Manager, parent renderline.Node) {
 }
-
-// GUMIRenderer / GUMIRender				-> Define::Empty
-func (s AEmpty) GUMIUpdate() {
-}
-
-// GUMIRenderer / GUMIDraw					-> Define::Empty
-func (s AEmpty) GUMIDraw() {
-}
-
 // GUMIEventer / GUMIHappen					-> Define
 func (AEmpty) GUMIHappen(event Event) {
 }

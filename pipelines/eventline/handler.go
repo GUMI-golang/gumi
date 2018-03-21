@@ -3,41 +3,41 @@ package eventline
 import (
 	"image"
 	"time"
+	"github.com/GUMI-golang/gumi"
 )
 
-type Handler interface {
-	Handle()
-}
 
+
+// PreHandling
+type (
+	PreFocuser interface {
+		PreFocus(event gumi.Event, focus bool) gumi.Event
+	}
+)
+
+
+// Handling
 type (
 	Focuser interface {
 		Focus(focus bool)
 	}
 	Clicker interface {
-		Focuser
 		Click(ispress bool)
 	}
-	Scroll interface {
-		Focuser
+	Scroller interface {
 		Scroll(x, y int)
 	}
 	Editer interface {
-		Focuser
-		Edit(text string)
+		Edit(current string, completed string, editing rune)
+	}
+	Ticker interface {
+		Tick(t time.Duration)
+	}
+	Resizer interface {
+		Resize(r image.Rectangle)
+	}
+	Styler interface {
+		Style(style *gumi.Style)
 	}
 )
 
-//
-type Resizer interface {
-	Resize(r image.Rectangle)
-}
-
-//
-type Ticker interface {
-	Tick(t time.Time)
-}
-
-//
-//type Resizer interface {
-//	Resize(r image.Rectangle)
-//}

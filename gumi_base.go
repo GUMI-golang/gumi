@@ -4,6 +4,7 @@ package gumi
 
 import (
 	"github.com/GUMI-golang/gumi/pipelines/renderline"
+	"github.com/GUMI-golang/gumi/pipelines/eventline"
 )
 
 type VoidNode struct {
@@ -74,10 +75,13 @@ func (s *MultipleNode) Childrun() []GUMI {
 	return res
 }
 
-type styleStore struct {
-	style *Style
-}
-type rendererStore struct {
-	rmana *renderline.Manager
-	rnode renderline.Node
-}
+type (
+	rendererStore struct {
+		rmana *renderline.Manager
+		rnode renderline.Node
+	}
+	styleStore struct {
+		style *Style
+	}
+)
+
