@@ -1,12 +1,5 @@
 package gcore
 
-//func StringDeleteAction(ctrl bool, forward bool, src string, selectFrom, selectTo, count int) string{
-//	if forward{
-//
-//	}else {
-//		return src
-//	}
-//}
 func StringForwardBackSpace(str string, count int) string {
 	temp := []rune(str)
 	templen := len(temp)

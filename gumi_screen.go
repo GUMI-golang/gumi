@@ -1,15 +1,13 @@
 package gumi
 
 import (
-	"github.com/GUMI-golang/gumi/pipelines/eventline"
-	"github.com/GUMI-golang/gumi/pipelines/renderline"
 	"image"
 	"math/rand"
 )
 
 type Screen struct {
-	RenderingPipeline *renderline.Manager
-	EventPipeline     *eventline.Manager
+	//RenderingPipeline *renderline.RenderLine
+	//EventPipeline     *eventline.RenderLine
 	rstyle            *Style
 	//
 	_hook map[uint64]func(event Event) Event
@@ -17,11 +15,16 @@ type Screen struct {
 
 	//
 	root GUMIRoot
+	//
+	title string `xml:"name"`
+	width int `xml:"width"`
+	height int `xml:"height"`
 }
 
-func NewScreen(w, h int) *Screen {
+
+func NewScreen() *Screen {
 	res := &Screen{
-		RenderingPipeline: renderline.NewManager(w, h),
+
 		rstyle:            DefaultStyle(),
 		_hook:             make(map[uint64]func(event Event) Event),
 	}
@@ -29,16 +32,19 @@ func NewScreen(w, h int) *Screen {
 }
 
 func (s *Screen) Width() int {
-	return s.RenderingPipeline.Width()
+	//return s.RenderingPipeline.Width()
+	return 0
 }
 func (s *Screen) Height() int {
-	return s.RenderingPipeline.Height()
+	//return s.RenderingPipeline.Height()
+	return 0
 }
 func (s *Screen) Size() (width, height int) {
-	return s.RenderingPipeline.Size()
+	//return s.RenderingPipeline.Size()
+	return 0, 0
 }
 func (s *Screen) Root(root GUMI) {
-	s.root = newGUMIRoot(s, root)
+	//s.root = newGUMIRoot(s, root)
 }
 
 //
@@ -51,30 +57,30 @@ func (s *Screen) Event(event Event) {
 	if event == nil {
 		return
 	}
-	s.root.GUMIHappen(event)
+	//s.root.GUMIHappen(event)
 }
-
-//
 func (s *Screen) Init() {
-	s.root.GUMIInit()
-	s.root.GUMIStyle(s.rstyle)
+	//s.root.GUMIInit()
+	//s.root.GUMIStyle(s.rstyle)
 
 	// renderline은 렌더 트리를 완성시킨 이후 셋업해야 함 따라서 GUMIRenderSetup 이후 Setup을 함
-	s.root.GUMIRenderSetup(s.RenderingPipeline, s.RenderingPipeline.New(nil, nil))
+	//s.root.GUMIRenderSetup(s.RenderingPipeline, s.RenderingPipeline.New(nil, nil))
 }
 func (s *Screen) Update(info Information) {
-	s.root.GUMIInfomation(info)
+	//s.root.GUMIInfomation(info)
 }
 func (s *Screen) Draw() {
-	s.RenderingPipeline.Render()
+	//s.RenderingPipeline.Render()
 }
 
 //
 func (s *Screen) Frame() image.Image {
-	return s.RenderingPipeline.Image()
+	//return s.RenderingPipeline.Image()
+	return nil
 }
 func (s *Screen) RGBA() *image.RGBA {
-	return s.RenderingPipeline.Image()
+	//return s.RenderingPipeline.Image()
+	return nil
 }
 
 //

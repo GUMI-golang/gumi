@@ -6,16 +6,11 @@ package gumi
 import (
 	"fmt"
 	"github.com/GUMI-golang/gumi/gcore"
-	"github.com/GUMI-golang/gumi/pipelines/renderline"
 )
 
 // GUMI is a collection of basic elements
 type GUMI interface {
 	GUMIFunction
-	GUMITree
-	GUMIRenderer
-	GUMIEventer
-
 	fmt.Stringer
 }
 
@@ -29,20 +24,5 @@ type GUMIRoot interface {
 }
 
 type GUMIFunction interface {
-	GUMIInit()                       // TODO : Relay
-	GUMIInfomation(info Information) // TODO : Relay
-	GUMIStyle(style *Style)          // TODO : Relay
 	GUMISize() gcore.Size
-}
-type GUMITree interface {
-	born(gumi GUMI)
-	breed(gumi []GUMI)
-	Parent() GUMI
-	Childrun() []GUMI
-}
-type GUMIRenderer interface {
-	GUMIRenderSetup(man *renderline.Manager, parent renderline.Node)
-}
-type GUMIEventer interface {
-	GUMIHappen(event Event)
 }
