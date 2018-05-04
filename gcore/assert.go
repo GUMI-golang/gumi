@@ -11,3 +11,9 @@ func MustValue(val interface{}, err error) interface{} {
 	}
 	return val
 }
+
+func Ignore(err error) {
+}
+func IgnoreValue(val interface{}, err error) interface{} {
+	return val
+}

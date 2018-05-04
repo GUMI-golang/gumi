@@ -4,6 +4,9 @@
 *.so
 *.dylib
 
+# image file
+*.png
+
 # Test binary, build with `go test -c`
 *.test
 
