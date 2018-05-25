@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE gumi>
+<!--<?gumi-version 1.2.3?>-->
+
+<gumi>
+    <resource>
+        <resourceNSRoot>
+            <ns>
+                <embed id="HelloEmbed" mime="text/plain">Hello, Embed!</embed>
+            </ns>
+        </resourceNSRoot>
+    </resource>
+    <meta>
+        <locale>KO-KR</locale>
+        <framerate>60</framerate>
+        <title>Hello, World</title>
+        <size>(800,600)</size>
+    </meta>
+    <screen>
+        <background style:background="@uniform:///#FFF">
+            <center>
+                <size size="([:300], [:200])">
+                    <background style:background="@uniform:///#FF0">
+                        <text style:text-color="#F0F" align="(r, v)"><?resource:///resourceNSRoot/ns/HelloEmbed?></text>
+                    </background>
+                </size>
+            </center>
+        </background>
+    </screen>
+</gumi>

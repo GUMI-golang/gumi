@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE gumi>
+<?gumi-version 1.2.3?>
+
+
+<gumi>
+    <resource>
+        <uri id="cube" mime="image/jpeg">file:///./ex/dark soul wallpaper.jpg</uri>
+        <resourceNSRoot>
+            <ns>
+                <embed id="text" mime="text/plain">Hello, World!</embed>
+            </ns>
+        </resourceNSRoot>
+    </resource>
+    <meta>
+        <locale>KO-KR</locale>
+        <framerate>60</framerate>
+        <title>Hello, World</title>
+        <size>(800,600)</size>
+    </meta>
+    <screen>
+        <style text-color="#FF0000">
+            <center>
+                <background image="@resource:///cube">
+                    <text align="(h, v)"><?resource:///resourceNSRoot/ns/text?></text>
+                    <!--<empty></empty>-->
+                </background>
+            </center>
+        </style>
+    </screen>
+</gumi>

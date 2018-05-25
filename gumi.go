@@ -6,43 +6,42 @@ package gumi
 import (
 	"fmt"
 	"github.com/GUMI-golang/gumi/gcore"
-	"github.com/GUMI-golang/gumi/pipelines/renderline"
+	"github.com/GUMI-golang/gumi/gime"
 )
 
 // GUMI is a collection of basic elements
 type GUMI interface {
-	GUMIFunction
-	GUMITree
-	GUMIRenderer
-	GUMIEventer
-
+	MaxChildrun() int
+	Pipe() *Pipe
+	setPipe(v *Pipe)
 	fmt.Stringer
 }
-
-// GUMI Root is special case of GUMI
-// GUMI Root help to find Screen
-// Mostly root locate root position on GUMI Tree
-// But it is not necessary
-type GUMIRoot interface {
-	GUMI
-	Screen() *Screen
+type Sizer interface {
+	Size() gcore.Size
 }
 
-type GUMIFunction interface {
-	GUMIInit()                       // TODO : Relay
-	GUMIInfomation(info Information) // TODO : Relay
-	GUMIStyle(style *Style)          // TODO : Relay
-	GUMISize() gcore.Size
+type ParentGUMI struct {
+	pipe *Pipe
 }
-type GUMITree interface {
-	born(gumi GUMI)
-	breed(gumi []GUMI)
-	Parent() GUMI
-	Childrun() []GUMI
+func (s *ParentGUMI) Pipe() *Pipe {
+	return s.pipe
 }
-type GUMIRenderer interface {
-	GUMIRenderSetup(man *renderline.Manager, parent renderline.Node)
+func (s *ParentGUMI) Pipeline() *Pipeline {
+	return s.pipe.Pipeline
 }
-type GUMIEventer interface {
-	GUMIHappen(event Event)
+func (s *ParentGUMI) Screen() *Screen {
+	return s.pipe.Pipeline.Screen
+}
+func (s *ParentGUMI) setPipe(v *Pipe) {
+	 s.pipe = v
+}
+
+type ValueManager interface {
+	ListValue() []string
+	GetValue(t string) (gime.Value)
+	SetValue(t string, v gime.Value) error
+}
+type DefaultManager interface {
+	GetDefault() (gime.Value)
+	SetDefault(v gime.Value) error
 }

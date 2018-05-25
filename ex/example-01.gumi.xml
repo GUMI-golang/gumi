@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE gumi>
+<?gumi-version 1.2.3?>
+
+
+<gumi>
+    <resource>
+        <resourceNSRoot>
+            <ns>
+                <uri id="img" mime="image/png">file:///./ex/cubes_64.png</uri>
+            </ns>
+        </resourceNSRoot>
+    </resource>
+    <meta>
+        <locale>KO-KR</locale>
+        <framerate>60</framerate>
+        <title>Hello, World</title>
+        <size>(800,600)</size>
+    </meta>
+    <screen>
+        <style text-color="#FF0000">
+            <center>
+                <size size="([:128], [:128])">
+                    <image><?resource:///resourceNSRoot/ns/img?></image>
+                </size>
+            </center>
+        </style>
+    </screen>
+</gumi>

@@ -3,52 +3,18 @@ package gcore
 import (
 	"fmt"
 	"math"
+	"regexp"
+	"strings"
+	"github.com/pkg/errors"
+	"strconv"
 )
-
-type Blank struct {
-	L, B, R, T Length
-}
-
-func (s *Blank) String() string {
-	return fmt.Sprintf(
-		"[L:%v, R:%v, T:%v, B:%v]", s.L, s.R, s.T, s.B,
-	)
-}
-
-func SymmetryBlank(horizontal, vertical Length) Blank {
-	return Blank{
-		L: horizontal,
-		R: horizontal,
-		B: vertical,
-		T: vertical,
-	}
-}
-func RegularBlank(regular Length) Blank {
-	return Blank{
-		L: regular,
-		R: regular,
-		B: regular,
-		T: regular,
-	}
-}
-
-type Size struct {
-	Vertical   Length
-	Horizontal Length
-}
-
-func (s Size) String() string {
-	return fmt.Sprintf(
-		"[Horizontal:%v, Verical:%v]", s.Horizontal, s.Vertical,
-	)
-}
 
 type Length struct {
 	Min, Max uint16
 }
 
 func (s Length) String() string {
-	return fmt.Sprintf("[Min:%d, Max:%d]", s.Min, s.Max)
+	return MarshalLength(s)
 }
 
 var (
@@ -83,4 +49,40 @@ func FixLength(fix uint16) Length {
 		Min: fix,
 		Max: fix,
 	}
+}
+
+//
+var re_length = regexp.MustCompile(`^\[(?P<min>[+]?[1-9]\d*|0|):(?P<max>[+]?[1-9]\d*|0|)]$`)
+func MarshalLength(l Length) string {
+	if l.Min == 0 && l.Max == math.MaxUint16{
+		return "[:]"
+	}else if l.Min == 0{
+		return fmt.Sprintf("[:%d]", l.Max)
+	}else if l.Max == math.MaxUint16{
+		return fmt.Sprintf("[%d:]", l.Min)
+	}
+	return fmt.Sprintf("[%d:%d]", l.Min, l.Max)
+}
+func UnmarshalLength(s string) (Length, error) {
+	s = strings.Replace(s, " ", "", -1)
+	m := re_length.FindStringSubmatch(s)
+	if len(m) > 0{
+		var min, max uint16 = 0, math.MaxUint16
+		if len(m[1]) != 0 {
+			temp, err := strconv.ParseUint(m[1], 10, 16)
+			if err != nil {
+				return MINLENGTH, err
+			}
+			min = uint16(temp)
+		}
+		if len(m[2]) != 0 {
+			temp, err := strconv.ParseUint(m[2], 10, 16)
+			if err != nil {
+				return MINLENGTH, err
+			}
+			max = uint16(temp)
+		}
+		return Length{Min:min, Max:max}, nil
+	}
+	return MINLENGTH, errors.New("Invalid length")
 }

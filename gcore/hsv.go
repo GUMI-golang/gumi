@@ -5,16 +5,6 @@ import (
 	"math"
 )
 
-func Clamp(i float64, min, max float64) float64 {
-	if i < min {
-		return min
-	}
-	if i > max {
-		return max
-	}
-	return i
-}
-
 // h [...1], s [...1], v [...1]
 func HSVToRGB(h, s, v float64) color.RGBA {
 	var i, f, p, q, t float64

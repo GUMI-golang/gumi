@@ -1,20 +1,23 @@
 package gcore
 
-func GCD(a, b int64) int64 {
-	for b != 0 {
-		t := b
-		b = a % b
-		a = t
+func Clamp(i float64, min, max float64) float64 {
+	if i < min {
+		return min
 	}
-	return a
+	if i > max {
+		return max
+	}
+	return i
 }
 
-func Sum(dts []float64) (res float64) {
-	for _, v := range dts {
-		res += v
+func GCD(a, b int64) (n int64){
+	if a < b{
+		a, b = b, a
 	}
-	return res
-}
-func Average(dts []float64) float64 {
-	return Sum(dts) / float64(len(dts))
+	for b != 0{
+		n = a % b
+		a = b
+		b = n
+	}
+	return
 }
