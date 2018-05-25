@@ -1,7 +1,7 @@
 package gumi
 
 import (
-	"github.com/GUMI-golang/gorat"
+	"github.com/GUMI-golang/giame"
 )
 
 type Pipeline struct {
@@ -9,8 +9,11 @@ type Pipeline struct {
 	Screen *Screen
 	Root   *Pipe
 
-	renderer gorat.Rasterizer
-	postRender gorat.Rasterizer
+	d giame.Driver
+	renderer giame.Result
+	todoR chan *giame.Contour
+	postRender giame.Result
+	todoPR chan *giame.Contour
 	//
 	//doneImage *image.RGBA
 	//postRect  image.Rectangle
@@ -20,6 +23,8 @@ type Pipeline struct {
 func NewPipeline(Screen *Screen) *Pipeline {
 	return &Pipeline{
 		Screen: Screen,
+		todoR: make(chan *giame.Contour, 16),
+		todoPR: make(chan *giame.Contour, 16),
 	}
 }
 func (s *Pipeline) New(parent *Pipe, elem GUMI) *Pipe {
@@ -38,24 +43,49 @@ func (s *Pipeline) New(parent *Pipe, elem GUMI) *Pipe {
 	}
 	return temp
 }
-func (s *Pipeline) Rasterizer(rasterzier, postRasterizer gorat.Rasterizer)  {
-	if rasterzier == nil || postRasterizer == nil{
+func (s *Pipeline) Rasterizer(dr giame.Driver, rasterzier, postRasterizer giame.Result)  {
+	if dr == nil || rasterzier == nil || postRasterizer == nil{
 		panic("Rasterizer error")
 	}
+	s.d = dr
 	s.renderer = rasterzier
 	s.postRender = postRasterizer
 }
 func (s *Pipeline) Rendering() {
 	s.postRender.Clear()
-	WorkingPipe(s.Root, postRenderWork)
+	go func() {
+		WorkingPipe(s.Root, postRenderWork)
+		s.todoPR <- nil
+	}()
 	haveTo := WorkingPipe(s.Root, doRenderValid)
 	if haveTo == needResizeAndRender{
 		s.renderer.Clear()
 		WorkingPipe(s.Root, doRenderResize)
-		WorkingPipe(s.Root, doRenderWork)
+		go func() {
+			WorkingPipe(s.Root, doRenderWork)
+			s.todoR <- nil
+		}()
 	}else if haveTo == needRender{
 		s.renderer.Clear()
-		WorkingPipe(s.Root, doRenderWork)
+		go func() {
+			WorkingPipe(s.Root, doRenderWork)
+			s.todoR <- nil
+		}()
+	}else {
+		s.todoR <- nil
+	}
+	for pr := range s.todoPR{
+		if pr == nil{
+			break
+		}
+		s.postRender.Request(s.d, pr)
+
+	}
+	for r := range s.todoR{
+		if r == nil{
+			break
+		}
+		s.renderer.Request(s.d, r)
 	}
 }
 

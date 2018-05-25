@@ -3,6 +3,7 @@ package gumi
 import (
 	"github.com/pkg/errors"
 	"image"
+	"github.com/GUMI-golang/giame"
 )
 
 // doRenderValid return this when need render
@@ -46,15 +47,21 @@ func doRenderResize(pipe *Pipe) error {
 //
 func doRenderWork(pipe *Pipe) error {
 	if r, ok := pipe.Elem.(DoRender); ok {
-
-		r.DoRender(pipe.Pipeline.renderer.SubRasterizer(r.GetBound()))
+		for _, v := range r.DoRender(giame.NewContourQuary(r.GetBound())) {
+			pipe.Pipeline.todoR <- v
+		}
 		r.Done()
 	}
 	return nil
 }
 func postRenderWork(pipe *Pipe) error {
 	if r, ok := pipe.Elem.(PostRender); ok {
-		r.PostRender(pipe.Pipeline.postRender)
+		w, h := pipe.Pipeline.postRender.Size()
+		r.PostRender(giame.NewContourQuary(image.Rect(0,0,w,h)))
+
+		for _, v := range r.PostRender(giame.NewContourQuary(pipe.Pipeline.Root.ProximateParentBound())) {
+			pipe.Pipeline.todoR <- v
+		}
 	}
 	return nil
 }

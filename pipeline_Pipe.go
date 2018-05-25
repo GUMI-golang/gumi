@@ -16,7 +16,8 @@ type Pipe struct {
 
 func (s *Pipe) ProximateParentBound() image.Rectangle {
 	if s.Parent == nil {
-		return s.Pipeline.renderer.Bound()
+		w, h := s.Pipeline.renderer.Size()
+		return image.Rect(0,0,w,h)
 	}
 	if r, ok := s.Parent.Elem.(Bounder); ok {
 		return r.RelayBound()
@@ -44,10 +45,12 @@ func (s *Pipe) GetStyle(data StyleData) interface{} {
 	if s.Parent == nil {
 		return nil
 	}
-
 	return s.Parent.GetStyle(data)
 }
 func (s *Pipe) SetStyle(data StyleData, value interface{}) bool {
+	if s.style == nil{
+		s.style = make(Style)
+	}
 	if data.Type().Valid(value) {
 		s.style[data] = value
 		return true

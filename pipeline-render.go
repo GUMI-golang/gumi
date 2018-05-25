@@ -2,7 +2,7 @@ package gumi
 
 import (
 	"image"
-	"github.com/GUMI-golang/gorat"
+	"github.com/GUMI-golang/giame"
 )
 
 type (
@@ -15,7 +15,7 @@ type (
 		needResize() bool
 	}
 	DoRender interface {
-		DoRender(rst gorat.SubRasterizer)
+		DoRender(q *giame.ContourQuary) []*giame.Contour
 		// Cache related
 		Throw()
 		Done()
@@ -23,7 +23,7 @@ type (
 		Bounder
 	}
 	PostRender interface {
-		PostRender(rasterzier gorat.SubRasterizer)
+		PostRender(rasterzier *giame.ContourQuary) []*giame.Contour
 	}
 )
 

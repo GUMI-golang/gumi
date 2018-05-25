@@ -7,6 +7,8 @@ import (
 	"github.com/GUMI-golang/gumi/gime"
 	"mime"
 	"path/filepath"
+	"github.com/GUMI-golang/gumi/gcore"
+	"github.com/GUMI-golang/giame"
 )
 
 func init()  {
@@ -23,4 +25,16 @@ func init()  {
 		}
 		return gime.Parse(*hintmime, bytes.NewReader(dat))
 	}, "gumi")
+
+	//gime.support uniform://
+	gime.Support(func(u url.URL, hintmime *string) (gime.Value) {
+		u.Path = strings.TrimPrefix(u.Path, "/")
+		c, err := gcore.UnmarshalColor(u.Path)
+		if err != nil {
+			return err
+		}
+		return giame.NewUniformFiller(c)
+	}, "uniform")
+
+
 }

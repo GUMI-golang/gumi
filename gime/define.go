@@ -23,6 +23,9 @@ func (s *URISupportMap) Support(handleFn func(u url.URL, hintmime *string) (Valu
 	}
 	return nil
 }
+
+// The reason that [hint] is Variadic Argument is to make it work without passing nil or empty value if there is no mime hint
+// [hint] only allow 0 or 1 argment, if more than 1 hint ignore all except first hint
 func (s *URISupportMap) Request(u url.URL, hint ... string) (Value) {
 	//
 	if fn, ok := s.mapping[u.Scheme]; ok {

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/GUMI-golang/gorat"
 	"github.com/GUMI-golang/gumi"
 	"github.com/GUMI-golang/gumi-basic/actor"
 	"github.com/GUMI-golang/gumi-basic/node"
@@ -10,14 +9,34 @@ import (
 	"strings"
 	"github.com/GUMI-golang/gumi-basic/layout"
 	"runtime"
-	"github.com/GUMI-golang/gorat/oglSupport/v43"
-	"github.com/GUMI-golang/gorat/fwrat"
 	"os"
 	"github.com/GUMI-golang/gumi-basic/drawing"
+	"github.com/GUMI-golang/giame/giamegl/giamegl43"
+	"log"
+	"github.com/go-gl/glfw/v3.2/glfw"
+	"github.com/go-gl/gl/v4.3-core/gl"
 )
 
 func main() {
-	f := gcore.MustValue(os.Open("./ex/example-03.gumi.xml")).(*os.File)
+	if err := glfw.Init(); err != nil {
+		log.Fatalln("failed to initialize glfw:", err)
+	}
+	defer glfw.Terminate()
+
+	glfw.WindowHint(glfw.Visible, glfw.False)
+	glfw.WindowHint(glfw.ContextVersionMajor, 4)
+	glfw.WindowHint(glfw.ContextVersionMinor, 3)
+	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
+	window, err := glfw.CreateWindow(1, 1, "Cube", nil, nil)
+	if err != nil {
+		panic(err)
+	}
+	window.MakeContextCurrent()
+	err = gl.Init()
+	if err != nil {
+		panic(err)
+	}
+	f := gcore.MustValue(os.Open("./ex/example-00.gumi.xml")).(*os.File)
 	defer f.Close()
 	//
 	xq, err := gumi.NewMLGBuilder(
@@ -34,38 +53,35 @@ func main() {
 	}
 	//==========================================================================================
 	runtime.LockOSThread()
-	octx := gcore.MustValue(fwrat.CreateOffscreenContext(v43.Driver())).(*fwrat.Offscreen)
-	defer octx.Delete()
-	gorat.Use(octx)
-
-	result := octx.Driver().Result(800, 600)
-	defer result.Delete()
-	res0 := octx.Driver().Result(800, 600)
-	defer res0.Delete()
-	rast0 := gorat.NewHardware(res0)
-	res1 := octx.Driver().Result(800, 600)
-	defer res1.Delete()
-	rast1 := gorat.NewHardware(res1)
+	dr := giamegl43.NewDriver()
+	gcore.Must(dr.Init())
+	defer dr.Close()
+	result := dr.MakeResult(800, 600).(giamegl43.GLResult)
+	r0 := dr.MakeResult(800, 600).(giamegl43.GLResult)
+	r1 := dr.MakeResult(800, 600).(giamegl43.GLResult)
 	//==========================================================================================
-
 	t := gcore.MustValue(xq.Build()).(*gumi.Screen)
 	recurpipe(t.Pipeline.Root, 0)
 	fmt.Println("==============================================")
-	t.Pipeline.Rasterizer(rast0, rast1)
+	t.Pipeline.Rasterizer(dr, r0, r1)
 	t.Pipeline.Rendering()
 	//==========================================================================================
-	gorat.Mixing(result, res0, res1)
+	giamegl43.Mixing(dr, result, r0, r1)
 	//
-	gcore.Capture("aout", result.Get())
-	gcore.Capture("aout0", res0.Get())
-	gcore.Capture("aout1", res1.Get())
+	gcore.Capture("aout", result.Image())
 	fmt.Println()
 }
 func recurpipe(pipe *gumi.Pipe, depth int) {
 	if pipe == nil {
 		return
 	}
-	fmt.Println(strings.Repeat("    ", depth), pipe.Elem)
+	fmt.Print(strings.Repeat("    ", depth))
+	if bdr, ok := pipe.Elem.(gumi.Bounder);ok{
+		fmt.Printf("%v, %v", bdr, bdr.GetBound())
+	}else {
+		fmt.Printf("%v", pipe.Elem)
+	}
+	fmt.Println()
 	for _, c := range pipe.Childrun {
 		recurpipe(c, depth+1)
 	}

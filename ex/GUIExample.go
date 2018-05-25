@@ -8,19 +8,19 @@ import (
 	"github.com/GUMI-golang/gumi-basic/actor"
 	"github.com/GUMI-golang/gumi-basic/node"
 	"github.com/GUMI-golang/gumi-basic/layout"
-	"runtime"
-	"github.com/GUMI-golang/gorat"
-	"github.com/GUMI-golang/gorat/oglSupport/v43"
 	"fmt"
 	"os"
 	"github.com/go-gl/gl/v4.3-core/gl"
 	"github.com/GUMI-golang/gumi-basic/drawing"
+	"github.com/GUMI-golang/giame/giamegl/giamegl43"
+	"runtime"
 )
 
 const (
 	w, h = 800, 600
 )
 func main() {
+	runtime.LockOSThread()
 	if err := glfw.Init(); err != nil {
 		log.Fatalln("failed to initialize glfw:", err)
 	}
@@ -35,7 +35,13 @@ func main() {
 		panic(err)
 	}
 	window.MakeContextCurrent()
-	f := gcore.MustValue(os.Open("./ex/example-03.gumi.xml")).(*os.File)
+	//glfw.SwapInterval(10)
+	//
+	err = gl.Init()
+	if err != nil {
+		panic(err)
+	}
+	f := gcore.MustValue(os.Open("./ex/example-00.gumi.xml")).(*os.File)
 	defer f.Close()
 	//
 	xq, err := gumi.NewMLGBuilder(
@@ -51,40 +57,33 @@ func main() {
 		panic(err)
 	}
 	//==========================================================================================
-	runtime.LockOSThread()
-	drv := v43.Driver()
-	gcore.Must(drv.Init())
-	sctx := gorat.CreateSimpleContext(drv)
-	gorat.Use(sctx)
-	res0 := sctx.Driver().Result(800, 600)
-	defer res0.Delete()
-	rast0 := gorat.NewHardware(res0)
-	res1 := sctx.Driver().Result(800, 600)
-	defer res1.Delete()
-	rast1 := gorat.NewHardware(res1)
+	dr := giamegl43.NewDriver()
+	gcore.Must(dr.Init())
+	defer dr.Close()
+	result := dr.MakeResult(800, 600).(giamegl43.GLResult)
+	r0 := dr.MakeResult(800, 600).(giamegl43.GLResult)
+	r1 := dr.MakeResult(800, 600).(giamegl43.GLResult)
 	//==========================================================================================
 	t := gcore.MustValue(xq.Build()).(*gumi.Screen)
 	fmt.Println("==============================================")
-	t.Pipeline.Rasterizer(rast0, rast1)
+	t.Pipeline.Rasterizer(dr, r0, r1)
 	//
-	var fbo [2]uint32
+	var fbo uint32
 	//
 	gl.Enable(gl.BLEND)
+	gl.ClearColor(0,0,0,1)
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-	gl.GenFramebuffers(2, &fbo[0])
-	gl.BindFramebuffer(gl.READ_FRAMEBUFFER, fbo[0])
-	gl.FramebufferTexture2D(gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, uint32(res0.(v43.GLResult)), 0)
-	gl.BindFramebuffer(gl.READ_FRAMEBUFFER, fbo[1])
-	gl.FramebufferTexture2D(gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, uint32(res1.(v43.GLResult)), 0)
+	gl.GenFramebuffers(1, &fbo)
+	gl.BindFramebuffer(gl.READ_FRAMEBUFFER, fbo)
+	gl.FramebufferTexture2D(gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, result.GLTex(), 0)
 	for !window.ShouldClose() {
 		gl.Clear(gl.COLOR_BUFFER_BIT)
-		//
 		t.Pipeline.Rendering()
+		giamegl43.Mixing(dr, result, r0, r1)
+		// Upload result to FrameBuffer using FrameBufferObject(FBO)
+		gl.BindFramebuffer(gl.READ_FRAMEBUFFER, fbo)
+		gl.BlitFramebuffer(0,0,w,h,0,0,w,h, gl.COLOR_BUFFER_BIT, gl.LINEAR)
 		//
-		gl.BindFramebuffer(gl.READ_FRAMEBUFFER, fbo[0])
-		gl.BlitFramebuffer(0,0,w,h,0,0,w,h, gl.COLOR_BUFFER_BIT, gl.LINEAR)
-		gl.BindFramebuffer(gl.READ_FRAMEBUFFER, fbo[1])
-		gl.BlitFramebuffer(0,0,w,h,0,0,w,h, gl.COLOR_BUFFER_BIT, gl.LINEAR)
 		window.SwapBuffers()
 		glfw.PollEvents()
 	}

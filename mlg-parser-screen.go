@@ -42,24 +42,65 @@ func screenLoad(s *Screen, p *Pipe, space *Space, e tree.Elem) error {
 			return errors.Wrap(ErrorParsingFail, xmlnamestring(v.Name)+" is not support")
 		}
 		curr := s.Pipeline.New(p, tag.New())
+		// direct Style Setup
+		for _, v := range e.GetAttrs() {
+			tk := v.GetToken().(xml.Attr)
+			if tk.Name.Space == "style"{
+				// direct style modify
+				if sd := FromStringStyleData(tk.Name.Local);sd != STYLE_INVALID{
+					if temp := re_XMLProcInst.FindStringSubmatch(strings.TrimSpace(tk.Value)); len(temp) > 1{
+						u := gime.URI(temp[1])
+						if u != nil{
+							v := s.Resource.Request(*u)
+							if err, ok := v.(error); ok && err != nil {
+								// TODO
+								panic(err)
+							}
+							ok := curr.SetStyle(sd, v)
+							if !ok{
+								panic("Not ok")
+							}
+						}else {
+							// TODO
+							log.Println(temp[1], "can't parse as gime")
+						}
+					}else {
+						v, err := sd.Type().Unmarshal(tk.Value)
+						if err != nil {
+							panic(err)
+						}
+						ok := curr.SetStyle(sd, v)
+						if !ok{
+							panic("Not ok")
+						}
+					}
+				}else {
+					// TODO
+					panic(tk.Name.Local)
+				}
+
+			}
+		}
 		if vm, ok := curr.Elem.(ValueManager); ok {
 			for _, v := range e.GetAttrs() {
 				tk := v.GetToken().(xml.Attr)
-				if temp := re_XMLProcInst.FindStringSubmatch(strings.TrimSpace(tk.Value)); len(temp) > 1{
-					u := gime.URI(temp[1])
-					if u != nil{
-						v := s.Resource.Request(*u)
-						if err, ok := v.(error); ok && err != nil {
+				if tk.Name.Space != "style"{
+					if temp := re_XMLProcInst.FindStringSubmatch(strings.TrimSpace(tk.Value)); len(temp) > 1{
+						u := gime.URI(temp[1])
+						if u != nil{
+							v := s.Resource.Request(*u)
+							if err, ok := v.(error); ok && err != nil {
+								// TODO
+								panic(err)
+							}
+							vm.SetValue(xmlnamestring(tk.Name), v)
+						}else {
 							// TODO
-							panic(err)
+							log.Println(temp[1], "can't parse as gime")
 						}
-						vm.SetValue(xmlnamestring(tk.Name), v)
 					}else {
-						// TODO
-						log.Println(temp[1], "can't parse as gime")
+						vm.SetValue(xmlnamestring(tk.Name), tk.Value)
 					}
-				}else {
-					vm.SetValue(xmlnamestring(tk.Name), tk.Value)
 				}
 			}
 		}

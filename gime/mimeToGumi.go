@@ -20,13 +20,15 @@ import (
 // - error
 // - string
 //		- text/plain
-// - image.Image
+// - giame.Filler
+//		- image/x-uniform
 //		- image/png
 //		- image/bmp
 //		- image/jpeg
 //		- image/webp
 // - textrat.Font
 //		- application/x-font-opentype
+//
 type Value interface {
 }
 

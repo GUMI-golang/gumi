@@ -21,6 +21,6 @@ func (s *Meta ) SetSize(size gcore.FixedSize)  {
 func (s *Meta) commit() {
 	if s.scr != nil{
 		// Todo
-		s.scr.Pipeline.renderer.Setup(s.size.Width, s.size.Height)
+		//s.scr.Pipeline.renderer.Setup(s.size.Width, s.size.Height)
 	}
 }

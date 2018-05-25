@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE gumi>
-<?gumi-version 1.2.3?>
-
+<!--<?gumi-version 1.2.3?>-->
 
 <gumi>
     <resource>
@@ -18,12 +17,14 @@
         <size>(800,600)</size>
     </meta>
     <screen>
-        <style text-color="#FF0000">
+        <background style:background="@uniform:///#FFF">
             <center>
                 <size size="([:300], [:200])">
-                    <text align="(r, t)"><?resource:///resourceNSRoot/ns/HelloEmbed?></text>
+                    <background style:background="@uniform:///#FF0">
+                        <text style:text-color="#F0F" align="(r, v)"><?resource:///resourceNSRoot/ns/HelloEmbed?></text>
+                    </background>
                 </size>
             </center>
-        </style>
+        </background>
     </screen>
 </gumi>
